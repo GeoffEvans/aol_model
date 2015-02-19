@@ -7,11 +7,15 @@ import copy
 
 # AOL model using AOD objects, incoroporating the Xu & Stroud diffraction theory.
 class AolFull(object):
+    """The full AOL model. Can take a list of rays and propagate them through
+    the AolFull. The ray energies and positions can be examined to evaluate
+    the AOL's performance. """
 
     @staticmethod
     def create_aol(aods, aod_spacing, order, op_wavelength, base_freq, pair_deflection_ratio, focus_position, \
             focus_velocity, ac_power=[default_power]*4, ac_velocity=teo2_ac_vel, ramp_time=pointing_ramp_time):
 
+        """Helper method to create the AOL with AODs and drive attributes."""
         crystal_thickness = array([a.crystal_thickness for a in aods], dtype=dtype(float))
         (const, linear, quad) = calculate_drive_freq_4(order, op_wavelength, ac_velocity, aod_spacing, crystal_thickness, \
                                 base_freq, pair_deflection_ratio, focus_position, focus_velocity)
@@ -29,6 +33,7 @@ class AolFull(object):
         self.base_ray_positions = simple.find_base_ray_positions(op_wavelength)
 
     def plot_ray_through_aol(self, rays, time, distance):
+        """Method to take a list of rays and plot their path through the AOL to a given distance past it. Ray states are unchanged."""
         import matplotlib.pyplot as plt
         from mpl_toolkits.mplot3d import Axes3D
         from numpy import meshgrid, atleast_3d, mean
@@ -66,6 +71,7 @@ class AolFull(object):
         return plt
 
     def propagate_to_distance_past_aol(self, rays, time, distance=0):
+        """Method to take a list of rays, propagate them through the AOL and then a given distance further. Ray states are changed."""
         num_rays = len(rays)
         crystal_thickness = array([a.crystal_thickness for a in self.aods], dtype=dtype(float))
         spacings = append(self.aod_spacing, distance)

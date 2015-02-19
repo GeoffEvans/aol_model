@@ -12,6 +12,7 @@ x_rad = linspace(-36, 36, 20) * 1e-3
 x_deg = x_rad * 180/pi
 
 def plot_fov_lines(focal_lengths, pdr):
+    """Plot field of view across y_angle=0 for a list of focal lengths and a fixed pair deflection ratio. """
     focus_position_many = []
     for f in focal_lengths:
         x = f * x_rad
@@ -22,6 +23,7 @@ def plot_fov_lines(focal_lengths, pdr):
     multi_line_plot_vals(x_deg, array(effs), labels, array(focal_lengths).astype(int), (min(x_deg),max(x_deg),0,1))
 
 def plot_fov_surf(focal_length, pdr):
+    """Plot field of view over a surface of solid angle (x_angle and y_angle) for a single focal length and a fixed pair deflection ratio. """
     (x_deg_m, y_deg_m) = meshgrid(x_deg, x_deg)
 
     x_array = x_rad * focal_length

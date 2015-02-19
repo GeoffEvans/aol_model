@@ -4,10 +4,11 @@ from aol_drive import get_reduced_spacings, calculate_drive_freq_4
 from error_utils import check_is_unit_vector, check_is_of_length, check_is_singleton
 import copy
 
-# Simplified AOL that treats AODs as thin and uses lambda*F/V to calculate deflection angles.
-# Can work with ray or ray_paraxial
 class AolSimple(object):
-
+    """ Simplified AOL that treats AODs as thin and uses lambda*F/V to
+    calculate deflection angles. Cannot calculate efficiencies. Useful for
+    calculating the AOD positions in the AolFull. Can work with ray or
+    ray_paraxial. """
     @staticmethod
     def create_aol(order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity, crystal_thickness=[0]*4):
         # useful for converting a 'real' aol into the simple aol
@@ -23,6 +24,7 @@ class AolSimple(object):
 
     @staticmethod
     def create_aol_from_drive(order, aod_spacing, const, linear, op_wavelength):
+        """Helper method to create the AOL with drive attributes."""
         acoustic_drives = AcousticDrive.make_acoustic_drives(const, linear)
 
         aol = AolSimple(order, aod_spacing, acoustic_drives)
@@ -57,6 +59,7 @@ class AolSimple(object):
         self.base_ray_positions = self.find_base_ray_positions(op_wavelength)
 
     def find_base_ray_positions(self, op_wavelength):
+        """Calculate the AOD positions for an AolFull."""
         from ray_paraxial import RayParaxial
         tracer_ray = RayParaxial([0,0,0], [0,0,1], op_wavelength)
 
@@ -73,6 +76,7 @@ class AolSimple(object):
         return path[:-1,0:2]
 
     def plot_ray_through_aol(self, ray, time, distance):
+        """Method to take a list of rays and plot their path through the AOL to a given distance past it. Ray states are unchanged."""
         import matplotlib as mpl
         from mpl_toolkits.mplot3d import Axes3D
         import matplotlib.pyplot as plt
@@ -103,6 +107,7 @@ class AolSimple(object):
         plt.show()
 
     def propagate_to_distance_past_aol(self, ray, time, distance=0):
+        """Method to take a list of rays, propagate them through the AOL and then a given distance further. Ray states are changed."""
         spacings = append(self.aod_spacing, distance)
         path = zeros( (5,3) )
 
