@@ -13,12 +13,6 @@ aol_model Package
 .. automodule:: aol_model.aod
     :members:
 
-:mod:`aod_model_expt_comparison` Module
----------------------------------------
-
-.. automodule:: aol_model.aod_model_expt_comparison
-    :members:
-
 :mod:`aod_visualisation` Module
 -------------------------------
 
@@ -49,12 +43,6 @@ aol_model Package
 .. automodule:: aol_model.error_utils
     :members:
 
-:mod:`expt_data` Module
------------------------
-
-.. automodule:: aol_model.expt_data
-    :members:
-
 :mod:`memoize` Module
 ---------------------
 
@@ -65,12 +53,6 @@ aol_model Package
 --------------------------------
 
 .. automodule:: aol_model.optically_uniaxial
-    :members:
-
-:mod:`optimisation_params` Module
----------------------------------
-
-.. automodule:: aol_model.optimisation_params
     :members:
 
 :mod:`optimise_aol` Module
@@ -119,12 +101,6 @@ aol_model Package
 --------------------------
 
 .. automodule:: aol_model.vector_utils
-    :members:
-
-:mod:`wavevector_triangle_solver` Module
-----------------------------------------
-
-.. automodule:: aol_model.wavevector_triangle_solver
     :members:
 
 :mod:`xu_stroud_model` Module

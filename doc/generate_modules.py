@@ -54,13 +54,11 @@ def write_file(name, text, opts):
     if opts.dryrun:
         return
     fname = os.path.join(opts.destdir, "%s.%s" % (name, opts.suffix))
-    if not opts.force and os.path.isfile(fname):
-        print 'File %s already exists, skipping.' % fname
-    else:
-        print 'Creating file %s.' % fname
-        f = open(fname, 'w')
-        f.write(text)
-        f.close()
+    #if not opts.force and os.path.isfile(fname):
+    print 'Creating file %s.' % fname
+    f = open(fname, 'w')
+    f.write(text)
+    f.close()
 
 def format_heading(level, text):
     """Create a heading of <level> [1, 2 or 3 supported]."""

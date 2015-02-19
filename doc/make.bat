@@ -1,5 +1,7 @@
 @ECHO OFF
 
+python generate_modules.py --suffix=rst --dest-dir=./source/modules ../aol_model
+
 REM Command file for Sphinx documentation
 
 if "%SPHINXBUILD%" == "" (

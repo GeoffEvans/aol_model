@@ -1,1 +1,0 @@
-python generate_modules.py --suffix=rst --dest-dir=./source/modules ../aol_model
