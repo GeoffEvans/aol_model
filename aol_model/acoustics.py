@@ -1,3 +1,10 @@
+"""The acoustics module provides the means to handle the acoustic wave involved
+in the acousto-optic interaction. An AOL associates an AcousticDrive object with
+each AOD object. When an optic ray (Ray object) is incident on the AOD, the
+AcousticDrive is called to generate the local acoustics, an Acoustics object.
+The Acoustics object is used in the xu_stroud_model module to handle the
+acousto-optic interaction."""
+
 from numpy import pi, dot, dtype, array, sqrt
 import numpy as np
 
@@ -6,7 +13,10 @@ pointing_ramp_time = 30e6
 default_power = 1
 
 class Acoustics(object):
-    """sphinx try out"""
+    """A class to hold the acoustic properties relevant to the acousto-optic
+    interaction. An Acoustics object is generated from an AcousticDrive object
+    for each Ray incident on an AOD object. The Acoustics object is used in
+    the xu_stroud_model module to handle the acousto-optic interaction."""
 
     def __init__(self, frequency, power=default_power, velocity=teo2_ac_vel):
         self.frequency = frequency
@@ -27,9 +37,15 @@ class Acoustics(object):
         return sqrt(numerator / denominator) # Xu & Stroud (2.143)
 
 class AcousticDrive(object):
+    """A class to hold the drive parameters for an AOD. An AOL associates an
+    AcousticDrive object with each of its AODs. When an optic ray (Ray object)
+    is incident on the AOD, the AcousticDrive is called to generate the local
+    acoustics, an Acoustics object."""
 
     @staticmethod
     def make_acoustic_drives(const, linear, quad=[0]*4, power=[default_power]*4, velocity=teo2_ac_vel, ramp_time=None):
+        """Generates four AcousticDrive objects at a time. The function is useful
+        because and AOL has four AODs, and each AOD requires a corresponding AcousticDrive."""
         acoustic_drives = [0]*4
         for k in range(4):
             acoustic_drives[k] = AcousticDrive(const[k], linear[k], quad[k], power[k], velocity, ramp_time)
@@ -44,6 +60,8 @@ class AcousticDrive(object):
         self.ramp_time = ramp_time
 
     def get_local_acoustics(self, time, ray_positions, base_ray_position, aod_direction):
+        """Returns an Acoustics object to represent the local acoustic field at the
+        point an optic ray is incident on an AOD."""
         distances = dot(array(ray_positions)[:,0:2] - base_ray_position, aod_direction[0:2])
         effective_time = time - distances/self.velocity
 
