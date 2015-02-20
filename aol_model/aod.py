@@ -1,11 +1,11 @@
 """The aod module contains the Aod class, representing an AOD."""
 
-from teo2 import calc_refractive_indices
+from teo2 import calc_refractive_indices, ord_ref_ind_gradient
 from xu_stroud_model import diffract_acousto_optically
 from vector_utils import perpendicular_component_list, normalise_list, normalise, \
     angle_between_unit_vectors
 from error_utils import check_is_unit_vector
-from numpy import array, sqrt, arcsin, sin, cos, cross, dot, dtype, outer, power, allclose
+from numpy import array, sqrt, arcsin, sin, cos, cross, dot, dtype, outer, power, allclose, arctan2
 from numpy.linalg import norm
 from scipy.optimize import fsolve
 import teo2
@@ -72,8 +72,17 @@ class Aod(object):
             rays[m].position += distances[m] * directions[m]
 
     def get_ray_direction_ord(self, rays):
-        """Ignore relatively minor walkoff due to shape of indicatrix."""
-        return array([r.wavevector_unit for r in rays])
+        """Take account of relatively minor walkoff due to shape of indicatrix."""
+        # reduce problem to 2D by finding components parallel and perpendicular to optic axis
+        wavelengths = [r.wavelength_vac for r in rays]
+        unit_vecs = array([r.wavevector_unit for r in rays])
+        unit_vecs_perp = normalise_list(unit_vecs - outer(dot(unit_vecs, self.optic_axis), self.optic_axis))
+
+        angles = angle_between_unit_vectors(unit_vecs, self.optic_axis)
+        
+        tan_walkoff_angle = -ord_ref_ind_gradient(angles, rays[0].wavelength_vac) 
+        new_wavevecs = unit_vecs.transpose() + unit_vecs_perp.transpose() * tan_walkoff_angle
+        return normalise_list(new_wavevecs.transpose())
 
     def calc_refractive_indices_vectors(self, unit_vectors, wavelength):
         angles_to_axis = angle_between_unit_vectors(unit_vectors, self.optic_axis)

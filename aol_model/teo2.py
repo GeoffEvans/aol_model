@@ -28,6 +28,12 @@ def ref_ind_lookup(wavelength_vac_rounded):
         get_relative_impermeability_eigenvals(wavelength_vac_rounded), get_activity_vector(wavelength_vac_rounded))
     return (splrep(angles_stored, n_fixed_wavelength[0]), splrep(angles_stored, n_fixed_wavelength[1]))
 
+def ord_ref_ind_gradient(angles, wavelength_vac):
+    delta = 1e-4 # match the lookup table accuracy 
+    _, ord1 = calc_refractive_indices(angles, wavelength_vac)
+    _, ord2 = calc_refractive_indices(angles + delta, wavelength_vac)
+    return (ord2 - ord1) / delta
+
 # See Uchida 1971 for constants and formulas
 def get_ref_ind(wavelength_vac):
     F1 = array([220.6, 241.0])
@@ -61,10 +67,10 @@ def get_activity_vector(wavelength_vac):
 def plot_refractive_index(wavelength):
     angles = arange(-pi/2, pi/2, pi/360)
     n = calc_refractive_indices(angles, wavelength)
-
+    dn1 = ord_ref_ind_gradient(angles, wavelength)
     plt.plot(angles, n[0])
     plt.plot(angles, n[1])
-
+    plt.plot(angles, dn1)
     plt.xlabel('angle / rad')
     plt.ylabel('refractive index')
     plt.title('Ordinary under Extraordinary')
