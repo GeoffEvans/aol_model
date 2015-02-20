@@ -37,6 +37,16 @@ def plot_fov_surf(focal_length, pdr):
     generate_plot(effs, effs_norm, description)
     return effs_norm
 
+def plot_peak(focal_lengths):
+    import matplotlib.pyplot as plt
+    """Plot peak efficiency for a range of focal lenghts. Pair deflection ratio independent. """
+    focus_position_many = array([[[0,0,f]] for f in focal_lengths])
+    effs = get_effs(focus_position_many, 1) # the 1 here is an arbitrary pdr value
+    z = 1/array(focal_lengths)
+    labels = ["1/z / 1/m", "efficiency"]
+    plt.plot(z, array(effs)/max(effs), label=labels, marker='x')
+    plt.axis((min(z),max(z),0,1))
+
 def generate_plot(orig_img, normalised_img, description, colmap=plt.cm.bone):
     fig = plt.figure()
     angles = linspace(-36, 36, shape(orig_img)[0]) * 1e-3 * 180/pi
@@ -74,5 +84,9 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    plot_fov_surf(1e9, 0)
-
+    points = [2./(n+1e-6) for n in range(-4,6)]
+    plot_peak(points)
+    for fl in points:
+        plot_fov_surf(fl, 0)
+    for fl in points:
+        plot_fov_surf(fl, 1)
