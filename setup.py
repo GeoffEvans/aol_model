@@ -18,7 +18,7 @@ setup(
     description='A model of an acousto-optic lens',
     long_description=long_description,
 
-    url='https://github.com/geoff22873/aol_model',
+    url='https://github.com/GeoffEvans/aol_model',
 
     author='Geoff Evans',
     author_email='geoffrey.evans13@ucl.ac.uk',
