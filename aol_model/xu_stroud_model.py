@@ -91,9 +91,9 @@ def triangle_solve(sum_vector, base_length, normal, multiplier_func):
         new_sum_vector = sv - outer(dot(sv, normal) * (1 - ratio), normal) # improve approx
         return tail_rec_solve(new_sum_vector)
 
-    wavevec_out, valid_wavevecs = precondition(sum_vector, base_length, normal, multiplier_func)
+    wavevec_out = precondition(sum_vector, base_length, normal, multiplier_func)
 
-    wavevec_out[valid_wavevecs] = tail_rec_solve(wavevec_out[valid_wavevecs])
+    wavevec_out = tail_rec_solve(wavevec_out)
     wavevectors_out_unit = normalise_list(wavevec_out)
 
     wavevector_mismatches_mag = dot(wavevec_out - sum_vector, normal)
@@ -105,9 +105,7 @@ def precondition(sum_vectors, base_length, normal, multiplier_func):
     r_xy = sum_vectors - outer(dot(normal, sum_vectors.transpose()), normal)
     multiplier = multiplier_func(sum_vectors)
     r_z = sqrt( (base_length * multiplier)**2 - norm(r_xy, axis=1)**2 )
-    invalid_wavevecs = isnan(r_z) # has gone off the indicatrix
-    r_z[invalid_wavevecs] = 1e-6
+    assert not any(isnan(r_z)) # has gone off the indicatrix
 
-    valid_wavevecs = logical_not(invalid_wavevecs)
     wavevec_out = r_xy + outer(r_z, normal)
-    return wavevec_out, valid_wavevecs
+    return wavevec_out
