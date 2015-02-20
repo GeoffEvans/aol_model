@@ -6,7 +6,7 @@ from scipy import optimize
 from aod_visualisation import generic_plot_surface
 from set_up_utils import set_up_aol, get_ray_bundle
 
-op_wavelength = 920e-9
+op_wavelength = 909e-9
 base_freq = 39e6
 pdr = 0
 
@@ -109,9 +109,9 @@ def calculate_efficiency(aol, after_nth_aod, op_wavelength=op_wavelength):
 
 if __name__ == '__main__':
     # useful loop for calculating orientations, run from 1 to 4
-    aol = set_up_aol(op_wavelength, base_freq=base_freq, pair_deflection_ratio=-0.4, focus_position=[32e6,0,1e9])
+    aol = set_up_aol(op_wavelength, base_freq=base_freq, pair_deflection_ratio=-0, focus_position=[0,0,1e9])
 
-    print calculate_efficiency(aol, 2) # check efficiency at AOD
-    plot_region(2, aol) # make plot, click on two points both lying on the same line through the peak
-    optimise_nth_aod_by_hand(2, aol) # optimise aod using previous plot
-    print calculate_efficiency(aol, 2) # check efficiency has improved
+    print calculate_efficiency(aol, 1) # check efficiency at AOD
+    #plot_region(2, aol) # make plot, click on two points both lying on the same line through the peak
+    #optimise_nth_aod_by_hand(2, aol) # optimise aod using previous plot
+    print calculate_efficiency(aol, 1) # check efficiency has improved
