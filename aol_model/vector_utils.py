@@ -1,4 +1,4 @@
-from numpy import dot, outer, array, arccos, sum
+from numpy import dot, outer, array, arccos
 from numpy.linalg import norm
 
 def normalise(vector):
@@ -17,8 +17,4 @@ def perpendicular_component_list(vector_list, unit_normal):
 
 def angle_between_unit_vectors(v1, v2):
     dot_prods = dot(v1, v2)
-    return arccos(dot_prods)
-    
-def angle_between_unit_vectors_list(v1, v2):
-    dot_prods = sum(v1 * v2, axis=1)
     return arccos(dot_prods)

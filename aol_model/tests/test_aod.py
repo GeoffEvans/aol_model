@@ -12,14 +12,6 @@ def test_on_axis_ray_displacement():
     direction_unchanged = allclose(r.wavevector_unit, [0,0,1])
     assert still_on_axis and direction_unchanged
 
-def test_off_axis_ray_displacement():
-    wavevec = [17./145,0,144./145]
-    rays = [Ray([0,0,0],wavevec,800e-9,1)]*5
-    aod.move_ray_through_aod(rays)
-    off_wavevector = not allclose(cross([r.position for r in rays], wavevec), [0,0,0])
-    direction_unchanged = allclose([r.wavevector_unit for r in rays], wavevec)
-    assert off_wavevector and direction_unchanged
-
 def test_refractive_indices_match():
     wavelen = 800e-9    
     wavevec = [3./5,0,4./5]
@@ -37,15 +29,6 @@ def test_refracting_in_towards_normal():
     towards_normal = abs(cosine_outside) < abs(cosine_inside)
     not_reflected = cosine_outside * cosine_inside >= 0
     assert towards_normal.all() and not_reflected.all()
-
-def test_walkoff_towards_axis():
-    wavevec = normalise([0.01,0,1])
-    rays = [Ray([0,0,0],wavevec,800e-9,1)]*2
-    directions = aod.get_ray_direction_ord(rays)
-    cosine_wavevec = dot(wavevec, aod.optic_axis) 
-    cosine_dir =  dot(directions[0], aod.optic_axis)
-    walkoff_to_axis = cosine_wavevec < cosine_dir
-    assert walkoff_to_axis
 
 def test_refracting_in_at_normal():
     wavevec = [0,0,1]
