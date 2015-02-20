@@ -1,4 +1,4 @@
-'''The aod module contains the Aod class, representing an AOD.'''
+"""The aod module contains the Aod class, representing an AOD."""
 
 from teo2 import calc_refractive_indices
 from xu_stroud_model import diffract_acousto_optically
