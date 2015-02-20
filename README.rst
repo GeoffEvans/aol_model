@@ -1,7 +1,10 @@
 aol_model
 =======================
 
-A model of an acousto-optic lens. 
+A model of an acousto-optic lens.
+
+Doumentation is located at http://aol-model.readthedocs.org/.
+
 The lens design is detailed in [1]. 
 The model is described and used extensively in [2].
 
