@@ -182,5 +182,5 @@ class AodVisualisation(object):
         generic_plot(ac_power_range, func, labels, (min(ac_power_range),max(ac_power_range),0,1))
 
 if __name__ == '__main__':
-    av = AodVisualisation(920e-9, is_wide=True)
+    av = AodVisualisation(909e-9, is_wide=False)
     av.plot_efficiency_xangle_freq()
