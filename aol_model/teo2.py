@@ -7,6 +7,7 @@ import optically_uniaxial as oua
 from numpy import power, arange, array, sqrt
 import numpy as np
 from memoize import memoized
+import matplotlib.pyplot as plt
 
 accuracy = 7
 
@@ -58,19 +59,17 @@ def get_activity_vector(wavelength_vac):
     return rotary_power_rad_per_micrometer * 1e6 * wavelength_vac / pi / power(get_ref_ind(wavelength_vac)[0], 3.) # Xu & St (1.78)
 
 def plot_refractive_index(wavelength):
-    from pylab import plot,xlabel,ylabel,title,grid,show
-
     angles = arange(-pi/2, pi/2, pi/360)
     n = calc_refractive_indices(angles, wavelength)
 
-    plot(angles, n[0])
-    plot(angles, n[1])
+    plt.plot(angles, n[0])
+    plt.plot(angles, n[1])
 
-    xlabel('angle / rad')
-    ylabel('refractive index')
-    title('Ordinary under Extraordinary')
-    grid(True)
-    show()
+    plt.xlabel('angle / rad')
+    plt.ylabel('refractive index')
+    plt.title('Ordinary under Extraordinary')
+    plt.grid(True)
+    plt.show()
 
 if __name__ == '__main__':
     plot_refractive_index(800e-9)
