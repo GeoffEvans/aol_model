@@ -3,7 +3,8 @@
 from aol_model.aol_full import AolFull
 from aol_model.aod import Aod
 from aol_model.ray import Ray
-from numpy import array, linspace, exp, power
+from numpy import array, linspace, exp, power, meshgrid, cos, sin
+from scipy.constants import pi
 from aol_model.vector_utils import normalise_list
 
 def set_up_aol( op_wavelength, \
@@ -32,14 +33,15 @@ def set_up_aol( op_wavelength, \
 
 def get_ray_bundle(op_wavelength, width=15e-3):
     """Create a grid of rays. Useful for passing into an Aol instance."""
-    x_array = linspace(-width/2, width/2, 5)
-    y_array = x_array
+    r_array = width / 4 * linspace(-1, 1, 5)
+    angle_array = linspace(0, pi, 5)[:-1]
+    r_mesh, angle_mesh = meshgrid(r_array, angle_array)
 
-    rays = [0] * len(x_array) * len(y_array)
-    for xn in range(len(x_array)):
-        for yn in range(len(y_array)):
-            rays[xn + yn*len(x_array)] = Ray([x_array[xn],y_array[yn],0], [0,0,1], op_wavelength)
-
+    rays = []
+    for r, ang in zip(r_mesh.ravel(), angle_mesh.ravel()):
+            x = r * cos(ang)
+            y = r * sin(ang)
+            rays.append(Ray([x,y,0], [0,0,1], op_wavelength))
     return rays
 
 def p(x, width):
