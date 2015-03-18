@@ -30,7 +30,7 @@ def find_constant(order, op_wavelength, ac_velocity, spacing, base_freq, pair_de
     # traditionally, this means r = 1, while all on the second would be r = 0
 
     multiplier = ac_velocity / (op_wavelength * order)
-    dfx = multiplier * xy_deflection[0] / (pair_deflection_ratio * spacing[0:4].sum() + spacing[2:4].sum()) # neater approach than in matlab
+    dfx = multiplier * xy_deflection[0] / (pair_deflection_ratio * spacing[0:4].sum() + spacing[2:4].sum())
     dfy = multiplier * xy_deflection[1] / (pair_deflection_ratio * spacing[1:4].sum() + spacing[3:4].sum())
 
     return array([base_freq + pair_deflection_ratio * dfx, \

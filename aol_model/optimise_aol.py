@@ -112,6 +112,6 @@ if __name__ == '__main__':
     aol = set_up_aol(op_wavelength, base_freq=base_freq, pair_deflection_ratio=-0, focus_position=[0,0,1e9])
 
     print calculate_efficiency(aol, 1) # check efficiency at AOD
-    #plot_region(2, aol) # make plot, click on two points both lying on the same line through the peak
-    #optimise_nth_aod_by_hand(2, aol) # optimise aod using previous plot
+    plot_region(1, aol) # make plot, click on two points both lying on the same line through the peak
+    optimise_nth_aod_by_hand(1, aol) # optimise aod using previous plot
     print calculate_efficiency(aol, 1) # check efficiency has improved

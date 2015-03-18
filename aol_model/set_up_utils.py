@@ -3,7 +3,8 @@
 from aol_model.aol_full import AolFull
 from aol_model.aod import Aod
 from aol_model.ray import Ray
-from numpy import array, linspace, exp, power
+from numpy import array, linspace, exp, power, meshgrid, cos, sin
+from scipy.constants import pi
 from aol_model.vector_utils import normalise_list
 
 def set_up_aol( op_wavelength, \
@@ -17,8 +18,8 @@ def set_up_aol( op_wavelength, \
     orient_39_920 = normalise_list(array([ \
         [-0.036, 0., 1], \
         [-0.054, -0.036,  1], \
-        [-0.022, -0.054,  1], \
-        [0.0, -0.022, 1] ]))
+        [-0.018, -0.054,  1], \
+        [0.0, -0.023, 1] ])) # 0.022
 
     aod_spacing = array([5e-2] * 3)
     aods = [0]*4
@@ -32,14 +33,15 @@ def set_up_aol( op_wavelength, \
 
 def get_ray_bundle(op_wavelength, width=15e-3):
     """Create a grid of rays. Useful for passing into an Aol instance."""
-    x_array = linspace(-width/2, width/2, 5)
-    y_array = x_array
+    r_array = width / 4 * linspace(-1, 1, 5)
+    angle_array = linspace(0, pi, 5)[:-1]
+    r_mesh, angle_mesh = meshgrid(r_array, angle_array)
 
-    rays = [0] * len(x_array) * len(y_array)
-    for xn in range(len(x_array)):
-        for yn in range(len(y_array)):
-            rays[xn + yn*len(x_array)] = Ray([x_array[xn],y_array[yn],0], [0,0,1], op_wavelength)
-
+    rays = []
+    for r, ang in zip(r_mesh.ravel(), angle_mesh.ravel()):
+            x = r * cos(ang)
+            y = r * sin(ang)
+            rays.append(Ray([x,y,0], [0,0,1], op_wavelength))
     return rays
 
 def p(x, width):
@@ -55,8 +57,13 @@ def q(x, width):
 def r(x, lower, lower_width, upper, upper_width): # 11.13 Priestley, Introduction to Integration
     return q(upper - x, upper_width) * q(x - lower, lower_width)
 
+def narrow_transducer_peak(freq):
+    # account for the narrow transducer peak - see p333 of Goutzoulis and Pape
+    freq_arr = array(freq) / 1e6 - 39
+    return - 0.14 * freq_arr**2 / (freq_arr**2 + 7)
+
 def transducer_efficiency_narrow(freq):
-    return r(array(freq), 13e6, 10e6, 90e6, 10e6)
+    return r(array(freq), 12e6, 10e6, 90e6, 10e6) + narrow_transducer_peak(freq)
 def transducer_efficiency_wide(freq):
     return r(array(freq), 15e6, 10e6, 85e6, 10e6)
 
@@ -66,3 +73,10 @@ def make_aod_wide(orientation, ac_dir):
 def make_aod_narrow(orientation, ac_dir):
     """Create an Aod instance with a 1.2mm transducer. """
     return Aod(orientation, ac_dir, 16e-3, 1.2e-3, 8e-3, transducer_efficiency_narrow)
+
+if __name__ == '__main__':
+    import matplotlib.pyplot as plt
+    f = linspace(10, 70, 120) * 1e6
+    plt.plot(f/1e6, r(array(f), 13e6, 10e6, 90e6, 10e6) + narrow_transducer_peak(f))
+    plt.xlabel('freq / MHz')
+    plt.ylabel('transducer efficiency')

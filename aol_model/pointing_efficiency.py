@@ -3,9 +3,9 @@ from numpy import linspace, shape, pi, array, meshgrid, arange, prod, transpose,
 from set_up_utils import get_ray_bundle, set_up_aol
 import matplotlib.pyplot as plt
 from matplotlib import rcParams as r
-r.update({'font.size': 30})
+r.update({'font.size': 24})
 
-op_wavelength = 909e-9
+op_wavelength = 920e-9
 base_freq = 39e6
 
 x_rad = linspace(-36, 36, 20) * 1e-3
@@ -24,17 +24,19 @@ def plot_fov_lines(focal_lengths, pdr):
 
 def plot_fov_surf(focal_length, pdr):
     """Plot field of view over a surface of solid angle (x_angle and y_angle) for a single focal length and a fixed pair deflection ratio. """
-    (x_deg_m, y_deg_m) = meshgrid(x_deg, x_deg)
+    effs_norm = calc_fov_surf_data(focal_length, pdr)
+    description = 'Model for PDR %s' % pdr
+    generate_plot(effs_norm, description)
+    return effs_norm
 
+def calc_fov_surf_data(focal_length, pdr):
+    (x_deg_m, y_deg_m) = meshgrid(x_deg, x_deg)
     x_array = x_rad * focal_length
     (x, y) = meshgrid(x_array, x_array)
     focus_position_many = transpose(array([x, y, focal_length+0*x]), [1,2,0])
 
     effs = get_effs(focus_position_many, pdr)
     effs_norm = effs / max(effs)
-
-    description = 'Model for PDR %s' % pdr
-    generate_plot(effs, effs_norm, description)
     return effs_norm
 
 def plot_peak(focal_lengths):
@@ -47,11 +49,11 @@ def plot_peak(focal_lengths):
     plt.plot(z, array(effs)/max(effs), label=labels, marker='x')
     plt.axis((min(z),max(z),0,1))
 
-def generate_plot(orig_img, normalised_img, description, colmap=plt.cm.bone, pdr=None):
+def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr=None):
     fig = plt.figure()
-    angles = linspace(-36, 36, shape(orig_img)[0]) * 1e-3 * 180/pi
+    angles = linspace(-36, 36, shape(normalised_img)[0]) * 1e-3 * 180/pi
 
-    plt.pcolormesh(angles, angles, orig_img, cmap=colmap)
+    plt.pcolormesh(angles, angles, normalised_img, cmap=colmap, vmin=0, vmax=1)
 
     cset = plt.contour(angles, angles, normalised_img, arange(0.1,1,0.1),linewidths=1, cmap=plt.cm.coolwarm)
     plt.clabel(cset, inline=True, fmt='%1.1f', fontsize=20)
@@ -76,7 +78,7 @@ def get_effs(focus_position_many, pdr):
     return array(effs).reshape(shp)
 
 def calculate_efficiency(aol):
-    time_array = (arange(3)-1)*2e-6
+    time_array = (arange(3)-1)*1e-7
     energy = 0
     ray_count = 0
 
@@ -89,9 +91,6 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    #points = [2./(n+1e-6) for n in range(-4,6)]
-    #plot_peak(points)
-    #for fl in points:
-    #    plot_fov_surf(fl, 0)
-    #for fl in points:
-        plot_fov_surf(0.2, 1)
+    #effs = plot_fov_surf(1e9, 0)
+    #print max(effs)
+    plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])
