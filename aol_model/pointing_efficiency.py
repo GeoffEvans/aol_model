@@ -47,7 +47,7 @@ def plot_peak(focal_lengths):
     plt.plot(z, array(effs)/max(effs), label=labels, marker='x')
     plt.axis((min(z),max(z),0,1))
 
-def generate_plot(orig_img, normalised_img, description, colmap=plt.cm.bone):
+def generate_plot(orig_img, normalised_img, description, colmap=plt.cm.bone, pdr=None):
     fig = plt.figure()
     angles = linspace(-36, 36, shape(orig_img)[0]) * 1e-3 * 180/pi
 
@@ -62,6 +62,11 @@ def generate_plot(orig_img, normalised_img, description, colmap=plt.cm.bone):
     ax.set_ylabel(labels[1])
     ax.text(0.1, 0.9, description, transform=ax.transAxes, color='w', fontsize=30)
     ax.set_aspect('equal', adjustable='box')
+    
+    if pdr is not None:
+        ang = - 9e6 * (920e-9 / 613) * (1+pdr) * (180 / pi)
+        plt.plot([ang, ang], [ang, 2], 'r-')
+        plt.plot([ang, ang], [2, ang], 'r-')
 
 def get_effs(focus_position_many, pdr):
     #get eff for a 2d array for focus positions (so 3d array input)
@@ -84,9 +89,9 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    points = [2./(n+1e-6) for n in range(-4,6)]
-    plot_peak(points)
-    for fl in points:
-        plot_fov_surf(fl, 0)
-    for fl in points:
-        plot_fov_surf(fl, 1)
+    #points = [2./(n+1e-6) for n in range(-4,6)]
+    #plot_peak(points)
+    #for fl in points:
+    #    plot_fov_surf(fl, 0)
+    #for fl in points:
+        plot_fov_surf(0.2, 1)
