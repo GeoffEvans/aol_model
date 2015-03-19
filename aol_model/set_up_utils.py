@@ -19,7 +19,7 @@ def set_up_aol( op_wavelength, \
         [-0.036, 0., 1], \
         [-0.054, -0.036,  1], \
         [-0.018, -0.054,  1], \
-        [0.0, -0.023, 1] ])) # 0.022
+        [0.0, -0.024, 1] ])) # 0.022
 
     aod_spacing = array([5e-2] * 3)
     aods = [0]*4
@@ -57,15 +57,24 @@ def q(x, width):
 def r(x, lower, lower_width, upper, upper_width): # 11.13 Priestley, Introduction to Integration
     return q(upper - x, upper_width) * q(x - lower, lower_width)
 
-def narrow_transducer_peak(freq):
-    # account for the narrow transducer peak - see p333 of Goutzoulis and Pape
-    freq_arr = array(freq) / 1e6 - 39
-    return - 0.14 * freq_arr**2 / (freq_arr**2 + 7)
+def narrow_transducer_peak(freq, centre, width, height):
+    freq_arr = array(freq) / 1e6 - centre
+    return height * (1 - freq_arr**2 / (freq_arr**2 + width))
 
-def transducer_efficiency_narrow(freq):
-    return r(array(freq), 12e6, 10e6, 90e6, 10e6) + narrow_transducer_peak(freq)
-def transducer_efficiency_wide(freq):
-    return r(array(freq), 15e6, 10e6, 85e6, 10e6)
+import expt_data as data
+import scipy.interpolate as interp
+profile_points = [0.52234631903519813, 0.55012067968962641, 0.6192829085994106, 0.68639957236869553, 0.63196874587441343, 0.47272087689723197, 0.42567446015841842, 0.48441767099699601, 0.65773072824321832, 0.77243458378400831, 0.81959932917417899, 0.89264810013635221, 0.92508418820625138, 0.90591507662766879, 0.84641841772725646, 0.82375973725822105, 0.80161022883030675, 0.74821649842319204, 0.68957047831550022, 0.65160805318284287]
+acc_profile = interp.splrep(data.freq_narrow_new, profile_points)
+
+def transducer_efficiency_narrow(freq_raw):
+    freq = array(freq_raw)
+    vals = interp.splev(array(freq)/1e6, acc_profile)
+    vals[freq > 50e6] = 0.65
+    vals[freq < 20e6] = 0.522
+    return vals * r(freq, 14e6, 7e6, 85e6, 10e6)
+def transducer_efficiency_wide(freq_raw):
+    freq = array(freq_raw)
+    return 0.3 * r(freq, 17e6, 5e6, 85e6, 10e6) + 0.7 * r(freq, 26e6, 10e6, 85e6, 10e6)
 
 def make_aod_wide(orientation, ac_dir):
     """Create an Aod instance with a 3.3mm transducer. """
@@ -76,7 +85,8 @@ def make_aod_narrow(orientation, ac_dir):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    f = linspace(10, 70, 120) * 1e6
-    plt.plot(f/1e6, r(array(f), 13e6, 10e6, 90e6, 10e6) + narrow_transducer_peak(f))
+    f = linspace(5, 85, 400) * 1e6
+    plt.plot(f/1e6, transducer_efficiency_wide(f))
+    plt.plot(f/1e6, f*0)
     plt.xlabel('freq / MHz')
     plt.ylabel('transducer efficiency')

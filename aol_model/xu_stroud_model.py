@@ -2,12 +2,12 @@
 The xu_stroud_model module contains the functions to diffract an optic ray accordiong to the
 Xu and Stroud theory."""
 
-from numpy import dot, sin, sqrt, array, power, outer, abs, all, isnan, logical_not
+from numpy import dot, sin, sqrt, array, power, outer, abs, all, isnan
 from scipy.constants import c, pi
 from numpy.linalg import norm
 from vector_utils import normalise_list
 
-def diffract_acousto_optically(aod, rays, local_acoustics, order, ext_to_ord=True, rescattering=True):
+def diffract_acousto_optically(aod, rays, local_acoustics, order, ext_to_ord=True):
     """The top level function handles the diffraction and sets out details
     including possible polarisations (ordinary or exrtaordinary -> ordinary
     or extraordinary) and whether second order diffraction is included."""
@@ -25,17 +25,17 @@ def diffract_acousto_optically(aod, rays, local_acoustics, order, ext_to_ord=Tru
     (efficiencies, wavevecs_out_unit, wavevecs_out_mag) = \
         get_diffracted_wavevectors_and_efficiency(aod, wavevecs_in_unit, wavevecs_in_mag, local_acoustics, order, ref_inds)
 
-    if rescattering:
-        rev_ref_inds = ref_inds[::-1]
-        same_ref_inds = [ref_inds[1]]*2
-        (efficiencies_r1,_,_) = get_diffracted_wavevectors_and_efficiency(aod, wavevecs_out_unit, wavevecs_out_mag, local_acoustics, order, rev_ref_inds)
-        (efficiencies_r2,_,_) = get_diffracted_wavevectors_and_efficiency(aod, wavevecs_out_unit, wavevecs_out_mag, local_acoustics, order, same_ref_inds)
-        efficiencies *= (1 - 0.8*efficiencies_r1 - 0.8*efficiencies_r2 + 2*efficiencies_r1*efficiencies_r2)
+    # rescattering
+    rev_ref_inds = ref_inds[::-1]
+    (efficiencies_r,_,_) = get_diffracted_wavevectors_and_efficiency(aod, wavevecs_out_unit, wavevecs_out_mag, local_acoustics, order, rev_ref_inds)
+    rescattering_terms = 0.5 * efficiencies_r # 0.5 inferred from single AOD experiment, may depend on AOD design and optical wavelength
+    efficiencies *= 1 - rescattering_terms
 
-    for r, m, u, e in zip(rays, wavevecs_out_mag, wavevecs_out_unit, efficiencies):
+    for r, m, u, e, resc in zip(rays, wavevecs_out_mag, wavevecs_out_unit, efficiencies, rescattering_terms):
         r.wavevector_vac_mag = m
         r.wavevector_unit = u
         r.energy *= e
+        r.resc = resc * e
 
 def get_diffracted_wavevectors_and_efficiency(aod, wavevecs_in_unit, wavevecs_in_mag, local_acoustics, order, ref_inds):
     """The basic Xu and Stroud theory is implemented in this function."""
@@ -62,7 +62,7 @@ def get_resultant_wavevectors(aod, wavevec_unit_in, wavevec_vac_mag_in, local_ac
 
 def get_efficiency(aod, wavevector_mismatches_mag, wavevecs_in_mag, wavevecs_in_unit, wavevecs_out_mag, wavevecs_out_unit, acoustics, ref_inds):
     """Based on the calculated diffracted wavevector, the diffraction efficiency can be calculated."""
-    amp = [a.amplitude(aod) for a in acoustics] * aod.transducer_efficiency_func([a.frequency for a in acoustics])
+    amp = [a.amplitude(aod) for a in acoustics] * sqrt(aod.transducer_efficiency_func([a.frequency for a in acoustics])) # square root because transducer eff is in terms of power
 
     n_in = ref_ind_ext_ord(aod, wavevecs_in_unit, wavevecs_in_mag)[ref_inds[0]]
     n_out = ref_ind_ext_ord(aod, wavevecs_out_unit, wavevecs_out_mag)[ref_inds[1]]

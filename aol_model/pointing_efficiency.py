@@ -8,7 +8,7 @@ r.update({'font.size': 24})
 op_wavelength = 920e-9
 base_freq = 39e6
 
-x_rad = linspace(-36, 36, 20) * 1e-3
+x_rad = linspace(-36, 36, 40) * 1e-3
 x_deg = x_rad * 180/pi
 
 def plot_fov_lines(focal_lengths, pdr):
@@ -55,14 +55,15 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone):
 
     plt.pcolormesh(angles, angles, normalised_img, cmap=colmap, vmin=0, vmax=1)
 
-    cset = plt.contour(angles, angles, normalised_img, arange(0.1,1,0.1),linewidths=1, cmap=plt.cm.coolwarm)
-    plt.clabel(cset, inline=True, fmt='%1.1f', fontsize=20)
+    has_contour = 0
+    cset = plt.contour(angles, angles, normalised_img, arange(0.1,1,0.1),linewidths=has_contour, cmap=plt.cm.coolwarm)
+    #plt.clabel(cset, inline=True, fmt='%1.1f', fontsize=20)
 
     labels = ["x angle / deg", "y angle / deg", "efficiency"]
     ax = fig.gca()
-    ax.set_xlabel(labels[0])
-    ax.set_ylabel(labels[1])
-    ax.text(0.1, 0.9, description, transform=ax.transAxes, color='w', fontsize=30)
+    #ax.set_xlabel(labels[0])
+    #ax.set_ylabel(labels[1])
+    ax.text(0.05, 0.9, description, transform=ax.transAxes, color='w', fontsize=27)
     ax.set_aspect('equal', adjustable='box')
 
 def get_effs(focus_position_many, pdr):
@@ -86,6 +87,6 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    #effs = plot_fov_surf(1e9, 0)
+    effs = plot_fov_surf(1e9, 0)
     #print max(effs)
-    plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])
+    #plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])

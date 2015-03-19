@@ -1,6 +1,6 @@
 from ray import Ray
 from acoustics import Acoustics
-from numpy import linspace, pi, sin, cos, abs, sqrt, arcsin, max, array
+from numpy import linspace, pi, sin, cos, abs, sqrt, arcsin, max, array, argmax
 from plot_utils import generic_plot_surface, generic_plot, multi_line_plot
 from xu_stroud_model import diffract_by_wavevector_triangle
 from set_up_utils import make_aod_narrow, make_aod_wide
@@ -13,7 +13,7 @@ class AodVisualisation(object):
             order=-1, \
             resolution=90, \
             freq_bnds=(20,50), \
-            deg_bnds=(0,5), \
+            deg_bnds=(1,4), \
             ):
         normal = [0,0,1]
         self.aod = make_aod_narrow(normal, ac_dir_rel)
@@ -51,6 +51,7 @@ class AodVisualisation(object):
             acoustics = Acoustics(mhz*1e6, ac_power)
 
             self.aod.propagate_ray([ray], [acoustics], self.order)
+            #return ray.resc / (ray.energy + 1e-3)
             return ray.energy
 
         labels = ["Incidence angle / deg","Frequency / MHz","Efficiency"]
@@ -126,12 +127,14 @@ class AodVisualisation(object):
             acoustics = Acoustics(mhz*1e6, ac_power)
 
             self.aod.propagate_ray(rays, [acoustics]*len(rays), self.order)
-            return max([r.energy for r in rays])
+            idx = argmax([r.energy for r in rays])
+            #return rays[idx].resc
+            return rays[idx].energy
 
         labels = ["Frequency / MHz","Efficiency"]
         generic_plot(self.mhz_range, func, labels, (min(self.mhz_range),max(self.mhz_range),0,1))
 
-    def plot_efficiency_freq_max_pwr(self, deg=1.95, power_wavelen=[(1.5, 800e-9), (1.5, 920e-9), (1.5, 1030e-9), (2.2, 920e-9)]):
+    def plot_efficiency_freq_max__power_varies_with_wavelength(self, deg=1.95, power_wavelen=[(1.5, 800e-9), (1.5, 920e-9), (1.5, 1030e-9), (2.2, 920e-9)]):
         """Plot maximum diffraction efficiency against acoustic power for fixed acoustic frequency and incidence angle."""
         def create_efficiency_function_closure(ac_power, wavelen):
             def func(mhz):
@@ -182,5 +185,6 @@ class AodVisualisation(object):
         generic_plot(ac_power_range, func, labels, (min(ac_power_range),max(ac_power_range),0,1))
 
 if __name__ == '__main__':
-    av = AodVisualisation(920e-9, is_wide=True)
+    av = AodVisualisation(920e-9, is_wide=False)
     av.plot_efficiency_xangle_freq(ac_power=1.5)
+    #av.plot_efficiency_freq_max()
