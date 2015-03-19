@@ -49,7 +49,7 @@ def plot_peak(focal_lengths):
     plt.plot(z, array(effs)/max(effs), label=labels, marker='x')
     plt.axis((min(z),max(z),0,1))
 
-def generate_plot(normalised_img, description, colmap=plt.cm.bone):
+def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr=None):
     fig = plt.figure()
     angles = linspace(-36, 36, shape(normalised_img)[0]) * 1e-3 * 180/pi
 
@@ -65,6 +65,11 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone):
     #ax.set_ylabel(labels[1])
     ax.text(0.05, 0.9, description, transform=ax.transAxes, color='w', fontsize=27)
     ax.set_aspect('equal', adjustable='box')
+
+    if pdr is not None:
+        ang = - 9e6 * (920e-9 / 613) * (1+pdr) * (180 / pi)
+        plt.plot([ang, ang], [ang, 2], 'r-')
+        plt.plot([ang, ang], [2, ang], 'r-')
 
 def get_effs(focus_position_many, pdr):
     #get eff for a 2d array for focus positions (so 3d array input)
