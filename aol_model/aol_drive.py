@@ -28,13 +28,25 @@ def find_constant(order, op_wavelength, ac_velocity, spacing, base_freq, pair_de
     """Calculate the centre frequency for each of the four AODs."""
     # for constant components, choose r to represent the ratio of ANGULAR deflection on the first of the pair to the second of the pair
     # traditionally, this means r = 1, while all on the second would be r = 0
-
     multiplier = ac_velocity / (op_wavelength * order)
-    dfx = multiplier * xy_deflection[0] / (pair_deflection_ratio * spacing[0:4].sum() + spacing[2:4].sum())
-    dfy = multiplier * xy_deflection[1] / (pair_deflection_ratio * spacing[1:4].sum() + spacing[3:4].sum())
+    
+    if pair_deflection_ratio is None:
+        min_pdr_x = (multiplier * xy_deflection[0] / (base_freq - 30e6) - spacing[2:4].sum()) / spacing[0:4].sum()
+        min_pdr_y = (multiplier * xy_deflection[1] / (base_freq - 30e6) - spacing[3:4].sum()) / spacing[1:4].sum()    
+        pair_deflection_ratio_x = max(0, min_pdr_x)
+        pair_deflection_ratio_y = max(0, min_pdr_y)
+    else:
+        pair_deflection_ratio_x = pair_deflection_ratio
+        pair_deflection_ratio_y = pair_deflection_ratio
+        
+    dfx = multiplier * xy_deflection[0] / (pair_deflection_ratio_x * spacing[0:4].sum() + spacing[2:4].sum())
+    dfy = multiplier * xy_deflection[1] / (pair_deflection_ratio_y * spacing[1:4].sum() + spacing[3:4].sum())
 
-    return array([base_freq + pair_deflection_ratio * dfx, \
-                  base_freq + pair_deflection_ratio * dfy, \
+    dfx = dfx if base_freq - 30e6 > dfx else base_freq - 30e6
+    dfy = dfy if base_freq - 30e6 > dfy else base_freq - 30e6
+    
+    return array([base_freq + pair_deflection_ratio_x * dfx, \
+                  base_freq + pair_deflection_ratio_y * dfy, \
                   base_freq - dfx, \
                   base_freq - dfy ])
 
