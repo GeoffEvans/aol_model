@@ -68,8 +68,12 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr=None):
 
     if pdr is not None:
         ang = - 9e6 * (920e-9 / 613) * (1+pdr) * (180 / pi)
-        plt.plot([ang, ang], [ang, 2], 'r-')
-        plt.plot([ang, ang], [2, ang], 'r-')
+        if ang < -2: # all ok
+            return
+        if ang > 2: # none ok
+            ang = 1.7
+        plt.plot([ang, ang], [ang, 2], 'r--')
+        plt.plot([ang, 2], [ang, ang], 'r--')
 
 def get_effs(focus_position_many, pdr):
     #get eff for a 2d array for focus positions (so 3d array input)
