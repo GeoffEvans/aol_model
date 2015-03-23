@@ -7,19 +7,25 @@ from numpy import array, linspace, exp, power, meshgrid, cos, sin
 from scipy.constants import pi
 from aol_model.vector_utils import normalise_list
 
+# experimentally inferred data
+import scipy.interpolate as interp
+freq_points = [20,22,23,24,25,27,28,30,33,35,37,38,39,40,41,42,43,45,47,50]
+profile_points = [0.52234631903519813, 0.55012067968962641, 0.6192829085994106, 0.68639957236869553, 0.63196874587441343, 0.47272087689723197, 0.42567446015841842, 0.48441767099699601, 0.65773072824321832, 0.77243458378400831, 0.81959932917417899, 0.89264810013635221, 0.92508418820625138, 0.90591507662766879, 0.84641841772725646, 0.82375973725822105, 0.80161022883030675, 0.74821649842319204, 0.68957047831550022, 0.65160805318284287]
+acc_profile = interp.splrep(freq_points, profile_points)
+
 def set_up_aol( op_wavelength, \
                 order=-1, \
                 base_freq=40e6, \
                 focus_position=[0,0,1e12], \
                 focus_velocity=[0,0,0], \
                 pair_deflection_ratio=1, \
-                ac_power=[1,1,2,2]):
+                ac_power=[1.5,1.5,2,2]):
     """Create an AolFull instance complete with Aods. """
     orient_39_920 = normalise_list(array([ \
         [-0.036, 0., 1], \
         [-0.054, -0.036,  1], \
-        [-0.018, -0.054,  1], \
-        [0.0, -0.024, 1] ])) # 0.022
+        [-0.020, -0.054,  1], \
+        [0.0, -0.026, 1] ])) # 0.022
 
     aod_spacing = array([5e-2] * 3)
     aods = [0]*4
