@@ -57,10 +57,6 @@ def q(x, width):
 def r(x, lower, lower_width, upper, upper_width): # 11.13 Priestley, Introduction to Integration
     return q(upper - x, upper_width) * q(x - lower, lower_width)
 
-def narrow_transducer_peak(freq, centre, width, height):
-    freq_arr = array(freq) / 1e6 - centre
-    return height * (1 - freq_arr**2 / (freq_arr**2 + width))
-
 import expt_data as data
 import scipy.interpolate as interp
 profile_points = [0.52234631903519813, 0.55012067968962641, 0.6192829085994106, 0.68639957236869553, 0.63196874587441343, 0.47272087689723197, 0.42567446015841842, 0.48441767099699601, 0.65773072824321832, 0.77243458378400831, 0.81959932917417899, 0.89264810013635221, 0.92508418820625138, 0.90591507662766879, 0.84641841772725646, 0.82375973725822105, 0.80161022883030675, 0.74821649842319204, 0.68957047831550022, 0.65160805318284287]
@@ -85,8 +81,8 @@ def make_aod_narrow(orientation, ac_dir):
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    f = linspace(5, 85, 400) * 1e6
-    plt.plot(f/1e6, transducer_efficiency_wide(f))
-    plt.plot(f/1e6, f*0)
-    plt.xlabel('freq / MHz')
-    plt.ylabel('transducer efficiency')
+    f = linspace(20, 50, 300) * 1e6
+    plt.plot(f/1e6, transducer_efficiency_narrow(f))
+    #plt.plot(f/1e6, f*0)
+    #plt.xlabel('freq / MHz')
+    #plt.ylabel('transducer efficiency')
