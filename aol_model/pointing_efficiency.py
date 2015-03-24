@@ -72,8 +72,8 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr=None):
             return
         if ang > 2: # none ok
             ang = 1.7
-        plt.plot([ang, ang], [ang, 2], 'r--')
-        plt.plot([ang, 2], [ang, ang], 'r--')
+        plt.plot([ang, ang], [ang, 2], 'r--', linewidth=4)
+        plt.plot([ang, 2], [ang, ang], 'r--', linewidth=4)
 
 def get_effs(focus_position_many, pdr):
     #get eff for a 2d array for focus positions (so 3d array input)
@@ -96,6 +96,6 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    effs = plot_fov_surf(1e9, None)
+    #effs = plot_fov_surf(1e9, None)
     #print max(effs)
-    #plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])
+    plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])
