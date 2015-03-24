@@ -5,6 +5,7 @@ from mpl_toolkits.mplot3d import Axes3D
 
 rcParams.update({'font.size': 20})
 rcParams.update({'figure.autolayout': True})
+rcParams['svg.fonttype'] = 'none'
 
 def generic_plot_surface(x_array, y_array, z_func, labels):
     (x, y) = meshgrid(x_array, y_array)
@@ -25,7 +26,7 @@ def generic_plot_surface_vals(x, y, z, labels):
     ax.set_ylabel(labels[1])
     cb = plt.colorbar(cs, orientation = 'vertical')
     cb.set_label(labels[2])
-    cs.set_clim(vmin=0,vmax=0.8)
+    cs.set_clim(vmin=0,vmax=1)
 
     plt.grid()
     plt.show()

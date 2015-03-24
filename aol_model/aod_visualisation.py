@@ -46,13 +46,28 @@ class AodVisualisation(object):
         incidence angle and acoustic frequency."""
         def func(deg, mhz):
             ang = deg * pi/180
+            optical_rot = pi/180 * 0
+            wavevector_unit = [cos(optical_rot)*sin(ang), sin(optical_rot), cos(optical_rot)*cos(ang)]
+            ray = Ray([0,0,0], wavevector_unit, self.op_wavelength_vac)
+            acoustics = Acoustics(mhz*1e6, ac_power)
+
+            self.aod.propagate_ray([ray], [acoustics], self.order)
+            return ray.energy
+
+        labels = ["Incidence angle / deg","Frequency / MHz","Efficiency"]
+        generic_plot_surface(self.degrees_range, self.mhz_range, func, labels)
+
+    def plot_efficiency_xangle_freq_second_order_noise(self, ac_power=1.5):
+        """Plot diffraction efficiency against
+        incidence angle and acoustic frequency."""
+        def func(deg, mhz):
+            ang = deg * pi/180
             wavevector_unit = [sin(ang), 0, cos(ang)]
             ray = Ray([0,0,0], wavevector_unit, self.op_wavelength_vac)
             acoustics = Acoustics(mhz*1e6, ac_power)
 
             self.aod.propagate_ray([ray], [acoustics], self.order)
-            #return ray.resc / (ray.energy + 1e-3)
-            return ray.energy
+            return ray.resc / (ray.energy + 1e-4)
 
         labels = ["Incidence angle / deg","Frequency / MHz","Efficiency"]
         generic_plot_surface(self.degrees_range, self.mhz_range, func, labels)
@@ -128,8 +143,22 @@ class AodVisualisation(object):
 
             self.aod.propagate_ray(rays, [acoustics]*len(rays), self.order)
             idx = argmax([r.energy for r in rays])
-            #return rays[idx].resc
             return rays[idx].energy
+
+        labels = ["Frequency / MHz","Efficiency"]
+        generic_plot(self.mhz_range, func, labels, (min(self.mhz_range),max(self.mhz_range),0,1))
+
+    def plot_efficiency_freq_max_second_order(self, ac_power=1.5):
+        """Plot maximum diffraction efficiency for any incidence angle against acoustic frequency."""
+        def func(mhz):
+            deg_range =  linspace(0.9, 3, 70)
+            rad_range = deg_range * pi / 180
+            rays = [Ray([0,0,0], [sin(ang), 0, cos(ang)], self.op_wavelength_vac) for ang in rad_range]
+            acoustics = Acoustics(mhz*1e6, ac_power)
+
+            self.aod.propagate_ray(rays, [acoustics]*len(rays), self.order)
+            idx = argmax([r.energy for r in rays])
+            return rays[idx].resc
 
         labels = ["Frequency / MHz","Efficiency"]
         generic_plot(self.mhz_range, func, labels, (min(self.mhz_range),max(self.mhz_range),0,1))
@@ -186,5 +215,8 @@ class AodVisualisation(object):
 
 if __name__ == '__main__':
     av = AodVisualisation(920e-9, is_wide=False)
+    av.plot_efficiency_xangle_freq(ac_power=1.5)
+#    av.plot_efficiency_xangle_freq_second_order_noise()
+    av = AodVisualisation(920e-9, is_wide=True)
     av.plot_efficiency_xangle_freq(ac_power=1.5)
     #av.plot_efficiency_freq_max()
