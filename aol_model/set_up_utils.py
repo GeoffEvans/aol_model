@@ -65,30 +65,37 @@ def r(x, lower, lower_width, upper, upper_width): # 11.13 Priestley, Introductio
 
 import expt_data as data
 import scipy.interpolate as interp
-profile_points = [0.52234631903519813, 0.55012067968962641, 0.6192829085994106, 0.68639957236869553, 0.63196874587441343, 0.47272087689723197, 0.42567446015841842, 0.48441767099699601, 0.65773072824321832, 0.77243458378400831, 0.81959932917417899, 0.89264810013635221, 0.92508418820625138, 0.90591507662766879, 0.84641841772725646, 0.82375973725822105, 0.80161022883030675, 0.74821649842319204, 0.68957047831550022, 0.65160805318284287]
-acc_profile = interp.splrep(data.freq_narrow_new, profile_points)
+narrow_profile_points = [0.54712759754904783, 0.575386586772488, 0.64817850300475155, 0.71968269967894605, 0.66290982971563983, 0.49579761657367089, 0.44650474031596715, 0.50940265439071475, 0.69301186826603234, 0.81193150290459226, 0.85782888217413467, 0.93219904972501266, 0.96421680546132216, 0.94353454724247032, 0.88135434188178652, 0.8582870021491632, 0.83612955880696582, 0.78199419058440867, 0.72104707424642145, 0.68040177140906999]
+narrow_acc_profile = interp.splrep(data.freq_narrow_new, narrow_profile_points)
+wide_profile_points = [0.094350627384094748, 0.25152444812354441, 0.20224064418336243, 0.2149465067006722, 0.2210201524375898, 0.28646854606515304, 0.37895636626149154, 0.5169059716247596, 0.77216739537957224, 0.74133769980752928, 0.74696461830104255, 0.76521892972101946, 0.771015715779509, 0.75897803272828135, 0.74232442605432569, 0.77943013556525065, 0.73577720729480833, 0.67265427728068794, 0.61626958165703483, 0.42166897973248169]
+wide_acc_profile = interp.splrep(data.freq_wide_new, wide_profile_points)
 
 def transducer_efficiency_narrow(freq_raw):
     freq = array(freq_raw)
-    vals = interp.splev(array(freq)/1e6, acc_profile)
-    vals[freq > 50e6] = 0.65
-    vals[freq < 20e6] = 0.522
+    vals = interp.splev(array(freq)/1e6, narrow_acc_profile)
+    vals[freq > 50e6] = interp.splev(50, narrow_acc_profile)
+    vals[freq < 20e6] = interp.splev(20, narrow_acc_profile)
     return vals * r(freq, 14e6, 7e6, 85e6, 10e6)
 def transducer_efficiency_wide(freq_raw):
     freq = array(freq_raw)
-    return 0.3 * r(freq, 17e6, 5e6, 85e6, 10e6) + 0.7 * r(freq, 26e6, 10e6, 85e6, 10e6)
+    vals = interp.splev(array(freq)/1e6, wide_acc_profile)
+    vals[freq > 50e6] = interp.splev(50, wide_acc_profile)
+    vals[freq < 20e6] = interp.splev(20, wide_acc_profile)
+    return vals * r(freq, 14e6, 7e6, 85e6, 10e6)
 
 def make_aod_wide(orientation, ac_dir):
     """Create an Aod instance with a 3.3mm transducer. """
-    return Aod(orientation, ac_dir, 16e-3, 3.3e-3, 8e-3, transducer_efficiency_wide)
+    return Aod(orientation, ac_dir, 16e-3, 3.15e-3, 8e-3, transducer_efficiency_wide)
 def make_aod_narrow(orientation, ac_dir):
     """Create an Aod instance with a 1.2mm transducer. """
-    return Aod(orientation, ac_dir, 16e-3, 1.2e-3, 8e-3, transducer_efficiency_narrow)
+    return Aod(orientation, ac_dir, 16e-3, 1.15e-3, 8e-3, transducer_efficiency_narrow)
 
 if __name__ == '__main__':
     import matplotlib.pyplot as plt
-    f = linspace(20, 50, 300) * 1e6
+    f = linspace(10, 60, 300) * 1e6
+    plt.figure()
     plt.plot(f/1e6, transducer_efficiency_narrow(f))
-    #plt.plot(f/1e6, f*0)
-    #plt.xlabel('freq / MHz')
-    #plt.ylabel('transducer efficiency')
+    plt.plot(f/1e6, transducer_efficiency_wide(f))
+    plt.plot(f/1e6, f*0)
+    plt.xlabel('freq / MHz')
+    plt.ylabel('transducer efficiency')
