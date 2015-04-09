@@ -16,7 +16,7 @@ def generic_plot_surface(x_array, y_array, z_func, labels):
 def generic_plot_surface_vals(x, y, z, labels):
     fig = plt.figure()
     ax = fig.gca()
-    cs = ax.pcolor(x, y, z)#, cmap='gray')
+    cs = ax.pcolor(x, y, z, cmap='bone')
 
     def onclick(event):
         print '[%f, %f]' % (event.xdata, event.ydata)
@@ -26,7 +26,7 @@ def generic_plot_surface_vals(x, y, z, labels):
     ax.set_ylabel(labels[1])
     cb = plt.colorbar(cs, orientation = 'vertical')
     cb.set_label(labels[2])
-    cs.set_clim(vmin=0,vmax=1)
+    #cs.set_clim(vmin=0,vmax=1)
 
     plt.grid()
     plt.show()

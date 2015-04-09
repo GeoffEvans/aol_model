@@ -8,7 +8,7 @@ r.update({'font.size': 24})
 op_wavelength = 920e-9
 base_freq = 39e6
 
-x_rad = linspace(-36, 36, 40) * 1e-3
+x_rad = linspace(-36, 36, 50) * 1e-3
 x_deg = x_rad * 180/pi
 
 def plot_fov_lines(focal_lengths, pdr):
@@ -49,7 +49,7 @@ def plot_peak(focal_lengths):
     plt.plot(z, array(effs)/max(effs), label=labels, marker='x')
     plt.axis((min(z),max(z),0,1))
 
-def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr=None):
+def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
     fig = plt.figure()
     angles = linspace(-36, 36, shape(normalised_img)[0]) * 1e-3 * 180/pi
 
@@ -63,11 +63,15 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr=None):
     ax = fig.gca()
     #ax.set_xlabel(labels[0])
     #ax.set_ylabel(labels[1])
-    ax.text(0.05, 0.9, description, transform=ax.transAxes, color='w', fontsize=27)
+    ax.text(0.03, 0.9, description, transform=ax.transAxes, color='w', fontsize=27)
     ax.set_aspect('equal', adjustable='box')
 
-    if pdr is not None:
-        ang = - 9e6 * (920e-9 / 613) * (1+pdr) * (180 / pi)
+    if pdr_z is not None and pdr_z[0] is not None and pdr_z[0] > -1:
+        #ang = - 9e6 * (920e-9 / 613) * (1+pdr) * (180 / pi)
+        L = 0.01
+        r = pdr_z[0]
+        z = pdr_z[1]
+        ang = -18 * (L*r/z + r + 1) * 0.92/613 / (2.15 + r) * 180 / pi
         if ang < -2: # all ok
             return
         if ang > 2: # none ok
@@ -96,6 +100,6 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    #effs = plot_fov_surf(1e9, None)
+    effs = plot_fov_surf(1e9, 0)
     #print max(effs)
-    plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])
+    #plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])

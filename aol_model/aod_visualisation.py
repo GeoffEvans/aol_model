@@ -12,8 +12,8 @@ class AodVisualisation(object):
             is_wide=True, \
             order=-1, \
             resolution=90, \
-            freq_bnds=(20,50), \
-            deg_bnds=(1,4), \
+            freq_bnds=(20,70), \
+            deg_bnds=(0.5,3.5), \
             ):
         normal = [0,0,1]
         self.aod = make_aod_narrow(normal, ac_dir_rel)
@@ -67,7 +67,7 @@ class AodVisualisation(object):
             acoustics = Acoustics(mhz*1e6, ac_power)
 
             self.aod.propagate_ray([ray], [acoustics], self.order)
-            return ray.resc / (ray.energy + 1e-4)
+            return ray.resc / (ray.energy + 1e-6)
 
         labels = ["Incidence angle / deg","Frequency / MHz","Efficiency"]
         generic_plot_surface(self.degrees_range, self.mhz_range, func, labels)
@@ -184,7 +184,7 @@ class AodVisualisation(object):
         lgnd = power_wavelen
         multi_line_plot(self.mhz_range, funcs, labels, lgnd, (min(self.mhz_range),max(self.mhz_range),0,1))
 
-    def plot_efficiency_xangle(self, ac_power=1.5, ac_mhz=35):
+    def plot_efficiency_xangle(self, ac_power=1.5, ac_mhz=39):
         """Plot diffraction efficiency against incidence angle for fixed acoustic frequency."""
         def func(deg):
             ang = deg * pi/180
@@ -216,7 +216,7 @@ class AodVisualisation(object):
 if __name__ == '__main__':
     av = AodVisualisation(920e-9, is_wide=False)
     av.plot_efficiency_xangle_freq(ac_power=1.5)
-#    av.plot_efficiency_xangle_freq_second_order_noise()
-    av = AodVisualisation(920e-9, is_wide=True)
-    av.plot_efficiency_xangle_freq(ac_power=1.5)
+    #av.plot_efficiency_xangle_freq_second_order_noise()
+    #av = AodVisualisation(920e-9, is_wide=True)
+    #av.plot_efficiency_xangle_freq(ac_power=1.5)
     #av.plot_efficiency_freq_max()
