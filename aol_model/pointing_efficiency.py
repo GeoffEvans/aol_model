@@ -54,6 +54,7 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
     angles = linspace(-36, 36, shape(normalised_img)[0]) * 1e-3 * 180/pi
 
     plt.pcolormesh(angles, angles, normalised_img, cmap=colmap, vmin=0, vmax=1)
+    plt.colorbar()
 
     has_contour = 0
     cset = plt.contour(angles, angles, normalised_img, arange(0.1,1,0.1),linewidths=has_contour, cmap=plt.cm.coolwarm)
