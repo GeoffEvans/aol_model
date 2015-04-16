@@ -116,14 +116,17 @@ def get_best_pdr_y(pdr, ang):
     return -calculate_efficiency(aol, 2) * calculate_efficiency(aol, 4) / calculate_efficiency(aol, 3)
 
 if __name__ == '__main__':
-    # useful loop for calculating orientations, run from 1 to 4
-    import matplotlib.pyplot as plt
-    import scipy.optimize as opt
-    list_ang = arange(-0.6, 2, 0.1)
-    pdrs = []
-    for ang in list_ang:
-        pdrs.append(opt.minimize_scalar(get_best_pdr_x, bounds=(-0.5, 2), method='bounded', args=(ang,)).x)
-    plt.plot(list_ang, pdrs)
+    aol = set_up_aol(op_wavelength, base_freq=base_freq, pair_deflection_ratio=None, focus_position=[0,0,1e9])
+    print calculate_efficiency(aol, 4) # check efficiency at AOD
+
+
+    #import matplotlib.pyplot as plt
+    #import scipy.optimize as opt
+    #list_ang = arange(-0.6, 2, 0.1)
+    #pdrs = []
+    #for ang in list_ang:
+    #    pdrs.append(opt.minimize_scalar(get_best_pdr_x, bounds=(-0.5, 2), method='bounded', args=(ang,)).x)
+    #plt.plot(list_ang, pdrs)
 
     #plot_region(1, aol) # make plot, click on two points both lying on the same line through the peak
     #optimise_nth_aod_by_hand(1, aol) # optimise aod using previous plot

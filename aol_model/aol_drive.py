@@ -35,17 +35,17 @@ def find_constant(order, op_wavelength, ac_velocity, spacing, base_freq, pair_de
         #min_pdr_y = (multiplier * xy_deflection[1] / (base_freq - 30e6) - spacing[3:4].sum()) / spacing[1:4].sum()
 
         # for linear LFL
-        x_on_z = ac_velocity / op_wavelength * xy_deflection[0] / spacing[2:4].sum()
         z_x = spacing[2:4].sum()
         L_x = spacing[0:2].sum()
+        x_on_z = ac_velocity / op_wavelength * xy_deflection[0] / z_x
         if x_on_z > -18e6 * (1 + L_x/z_x):
             min_pdr_x = - (18e6 + 2.15 * x_on_z) / (x_on_z + 18e6 * (L_x/z_x + 1))
         else:
             min_pdr_x = 10
 
-        y_on_z = ac_velocity / op_wavelength * xy_deflection[1] / spacing[3:4].sum()
         z_y = spacing[3:4].sum()
         L_y = spacing[1:3].sum()
+        y_on_z = ac_velocity / op_wavelength * xy_deflection[1] / z_y
         if y_on_z > -18e6 * (1 + L_y/z_y):
             min_pdr_y = - (18e6 + 2.15 * y_on_z) / (y_on_z + 18e6 * (L_y/z_y + 1))
         else:

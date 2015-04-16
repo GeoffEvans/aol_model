@@ -54,7 +54,7 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
     angles = linspace(-36, 36, shape(normalised_img)[0]) * 1e-3 * 180/pi
 
     plt.pcolormesh(angles, angles, normalised_img, cmap=colmap, vmin=0, vmax=1)
-    plt.colorbar()
+    #plt.colorbar()
 
     has_contour = 0
     cset = plt.contour(angles, angles, normalised_img, arange(0.1,1,0.1),linewidths=has_contour, cmap=plt.cm.coolwarm)
@@ -77,8 +77,8 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
             return
         if ang > 2: # none ok
             ang = 1.7
-        plt.plot([ang, ang], [ang, 2], 'r--', linewidth=4)
-        plt.plot([ang, 2], [ang, ang], 'r--', linewidth=4)
+        plt.plot([ang, ang], [ang, 2], 'y--', linewidth=4)
+        plt.plot([ang, 2], [ang, ang], 'y--', linewidth=4)
 
 def get_effs(focus_position_many, pdr):
     #get eff for a 2d array for focus positions (so 3d array input)
@@ -101,6 +101,6 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    effs = plot_fov_surf(1e9, 0)
+    effs = plot_fov_surf(1e9, None)
     #print max(effs)
     #plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])
