@@ -9,7 +9,7 @@ import numpy as np
 from memoize import memoized
 import matplotlib.pyplot as plt
 
-accuracy = 7
+accuracy = 8
 
 def calc_refractive_indices(angles, wavelength_vac):
     """Calculate the extraordinary and ordinary refractive indices at the given
@@ -29,7 +29,7 @@ def ref_ind_lookup(wavelength_vac_rounded):
     return (splrep(angles_stored, n_fixed_wavelength[0]), splrep(angles_stored, n_fixed_wavelength[1]))
 
 def ord_ref_ind_gradient(angles, wavelength_vac):
-    delta = 1e-4 # match the lookup table accuracy 
+    delta = 1e-4 # match the lookup table accuracy
     _, ord1 = calc_refractive_indices(angles, wavelength_vac)
     _, ord2 = calc_refractive_indices(angles + delta, wavelength_vac)
     return (ord2 - ord1) / delta
@@ -70,7 +70,7 @@ def plot_refractive_index(wavelength):
     dn1 = ord_ref_ind_gradient(angles, wavelength)
     plt.plot(angles, n[0])
     plt.plot(angles, n[1])
-    plt.plot(angles, dn1)
+    #plt.plot(angles, dn1)
     plt.xlabel('angle / rad')
     plt.ylabel('refractive index')
     plt.title('Ordinary under Extraordinary')
