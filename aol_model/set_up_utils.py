@@ -68,8 +68,8 @@ def transducer_efficiency_narrow(freq_raw):
     freq = array(freq_raw)
     vals = interp.splev(array(freq)/1e6, narrow_acc_profile)
     vals[freq > 50e6] = interp.splev(50, narrow_acc_profile)
-    vals[freq < 20e6] = interp.splev(20, narrow_acc_profile)
-    return vals * r(freq, 16e6, 5e6, 85e6, 10e6)
+    vals[freq < 20e6] = interp.splev(20, narrow_acc_profile) * r(freq[freq < 20e6], 18e6, 2e6, 85e6, 10e6)
+    return vals
 def transducer_efficiency_wide(freq_raw):
     freq = array(freq_raw)
     vals = interp.splev(array(freq)/1e6, wide_acc_profile)
