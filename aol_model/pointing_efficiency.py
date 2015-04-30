@@ -2,6 +2,7 @@ from plot_utils import multi_line_plot_vals
 from numpy import linspace, shape, pi, array, meshgrid, arange, prod, transpose, power, max
 from set_up_utils import get_ray_bundle, set_up_aol
 import matplotlib.pyplot as plt
+from scipy import ndimage
 from matplotlib import rcParams as r
 r.update({'font.size': 24})
 
@@ -43,7 +44,7 @@ def plot_peak(focal_lengths):
     import matplotlib.pyplot as plt
     """Plot peak efficiency for a range of focal lenghts. Pair deflection ratio independent. """
     focus_position_many = array([[[0,0,f]] for f in focal_lengths])
-    effs = get_effs(focus_position_many, 1) # the 1 here is an arbitrary pdr value
+    effs = get_effs(focus_position_many, 0.3) # the 0.3 here is an arbitrary pdr value
     z = 1/array(focal_lengths)
     labels = ["1/z / 1/m", "efficiency"]
     plt.plot(z, array(effs)/max(effs), label=labels, marker='x')
@@ -57,7 +58,8 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
     #plt.colorbar()
 
     has_contour = 0
-    cset = plt.contour(angles, angles, normalised_img, arange(0.1,1,0.1),linewidths=has_contour, cmap=plt.cm.coolwarm)
+    img_blur = ndimage.gaussian_filter(normalised_img, 1)
+    cset = plt.contour(angles, angles, img_blur, arange(0.3,1,0.2),linewidths=has_contour, cmap=plt.cm.coolwarm)
     #plt.clabel(cset, inline=True, fmt='%1.1f', fontsize=20)
 
     labels = ["x angle / deg", "y angle / deg", "efficiency"]
@@ -67,7 +69,8 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
     ax.text(0.03, 0.9, description, transform=ax.transAxes, color='w', fontsize=27)
     ax.set_aspect('equal', adjustable='box')
 
-    if pdr_z is not None and pdr_z[0] is not None and pdr_z[0] > -1:
+
+    if False and pdr_z is not None and pdr_z[0] is not None and pdr_z[0] > -1:
         #ang = - 9e6 * (920e-9 / 613) * (1+pdr) * (180 / pi)
         L = 0.01
         r = pdr_z[0]
@@ -101,6 +104,6 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    effs = plot_fov_surf(1e9, None)
+    effs = plot_fov_surf(1e9, 0)
     #print max(effs)
     #plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])
