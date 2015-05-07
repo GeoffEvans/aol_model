@@ -54,19 +54,25 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
     fig = plt.figure()
     angles = linspace(-36, 36, shape(normalised_img)[0]) * 1e-3 * 180/pi
 
-    plt.pcolormesh(angles, angles, normalised_img, cmap=colmap, vmin=0, vmax=1)
+    cm = plt.pcolormesh(angles, angles, normalised_img, cmap=colmap, vmin=0, vmax=1)
+    cm.set_rasterized(True)
+    plt.xticks([-2,0,2], ['','',''])
+    plt.xlim([-2,2])
+    plt.ylim([-2,2])
+    plt.yticks([-2,0,2], ['','',''])
+    plt.tick_params(direction='out')
     #plt.colorbar()
 
-    has_contour = 0
-    img_blur = ndimage.gaussian_filter(normalised_img, 1)
-    cset = plt.contour(angles, angles, img_blur, arange(0.3,1,0.2),linewidths=has_contour, cmap=plt.cm.coolwarm)
+    #has_contour = 0
+    #img_blur = ndimage.gaussian_filter(normalised_img, 1)
+    #cset = plt.contour(angles, angles, img_blur, arange(0.3,1,0.2), linewidths=has_contour, cmap=plt.cm.coolwarm)
     #plt.clabel(cset, inline=True, fmt='%1.1f', fontsize=20)
 
     labels = ["x angle / deg", "y angle / deg", "efficiency"]
     ax = fig.gca()
     #ax.set_xlabel(labels[0])
     #ax.set_ylabel(labels[1])
-    ax.text(0.03, 0.9, description, transform=ax.transAxes, color='w', fontsize=27)
+    #ax.text(0.03, 0.9, description, transform=ax.transAxes, color='w', fontsize=27)
     ax.set_aspect('equal', adjustable='box')
 
 
