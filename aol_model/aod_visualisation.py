@@ -12,7 +12,7 @@ class AodVisualisation(object):
             is_wide=True, \
             order=-1, \
             resolution=90, \
-            freq_bnds=(20,70), \
+            freq_bnds=(20,60), \
             deg_bnds=(0.5,3.5), \
             ):
         normal = [0,0,1]
@@ -214,9 +214,9 @@ class AodVisualisation(object):
         generic_plot(ac_power_range, func, labels, (min(ac_power_range),max(ac_power_range),0,1))
 
 if __name__ == '__main__':
-    av = AodVisualisation(920e-9, is_wide=False)
+    av = AodVisualisation(700e-9, is_wide=False)
     av.plot_efficiency_xangle_freq(ac_power=1.5)
-    #av.plot_efficiency_xangle_freq_second_order_noise()
-    #av = AodVisualisation(920e-9, is_wide=True)
-    #av.plot_efficiency_xangle_freq(ac_power=1.5)
+    av.plot_efficiency_xangle_freq_second_order_noise()
+    av = AodVisualisation(700e-9, is_wide=True)
+    av.plot_efficiency_xangle_freq(ac_power=1.5)
     #av.plot_efficiency_freq_max()

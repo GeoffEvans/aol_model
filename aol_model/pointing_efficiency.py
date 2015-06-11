@@ -110,6 +110,6 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    effs = plot_fov_surf(1e9, 0)
+    effs = plot_fov_surf(1e9, 0.3)
     #print max(effs)
     #plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])

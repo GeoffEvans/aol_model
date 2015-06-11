@@ -116,7 +116,10 @@ def get_best_pdr_y(pdr, ang):
     return -calculate_efficiency(aol, 2) * calculate_efficiency(aol, 4) / calculate_efficiency(aol, 3)
 
 if __name__ == '__main__':
-    aol = set_up_aol(op_wavelength, base_freq=base_freq, pair_deflection_ratio=None, focus_position=[0,0,1e9])
+    aol = set_up_aol(op_wavelength, base_freq=base_freq, pair_deflection_ratio=-0.4, focus_position=[1.1*3.14159/180*1e12,0,1e12])
+    print calculate_efficiency(aol, 1)
+    print calculate_efficiency(aol, 2)/calculate_efficiency(aol, 1)
+    print calculate_efficiency(aol, 3)/calculate_efficiency(aol, 2)
     print calculate_efficiency(aol, 4) # check efficiency at AOD
 
 

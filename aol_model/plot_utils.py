@@ -29,17 +29,15 @@ def generic_plot_surface_vals(x, y, z, labels):
 
     ax.set_xlabel(labels[0])
     ax.set_ylabel(labels[1])
-    #cb = plt.colorbar(cs, ticks=[0.00, 0.11, 0.22], orientation = 'vertical')
-    #cb.set_label(labels[2])
-    #cb.solids.set_rasterized(True)
+    cb = plt.colorbar(cs, orientation = 'vertical')
+    cb.set_label(labels[2])
+    cb.solids.set_rasterized(True)
     #cs.set_clim(vmin=0,vmax=1)
-    plt.xticks([])
-    plt.yticks([])
     plt.tick_params(direction='out')
     plt.show()
 
 def generic_plot_vals(x, y, labels, limits=0):
-    plt.plot(x, y)#, 'g:', linewidth=1)
+    plt.plot(x, y)#, 'g:')
     plt.tick_params(direction='out')
     plt.xlabel(labels[0])
     plt.ylabel(labels[1])
