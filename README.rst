@@ -1,14 +1,14 @@
 aol_model
 =======================
 
-A model of an acousto-optic lens.
+A model of an acousto-optic lens (AOL).
 
 Doumentation is located at http://aol-model.readthedocs.org/.
 
-The lens design is detailed in [1]. 
+Use the script aol_model/aol_model/figs_from_paper.py to generate the figures found in the recently submitted Optics Express paper "Development and application of a ray-based model of light propagation through a spherical acousto-optic lens".
 
-[1] A compact acousto-optic lens for 2D and 3D femtosecond based 2-photon microscopy
-PA Kirkby, KMS Nadella, RA Silver
-Optics express 18 (13), 13720-13744
+
+
+
 
 
