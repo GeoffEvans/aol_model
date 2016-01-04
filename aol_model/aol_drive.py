@@ -1,6 +1,6 @@
 """The aol_drive module handles the calculation of drive parameters for an AOL."""
 
-from numpy import array, append, dtype
+from numpy import array, append, dtype, sqrt
 
 def calculate_drive_freq_4(order, op_wavelength, ac_velocity, aod_spacing, crystal_thickness, base_freq, pair_deflection_ratio, focus_position, focus_velocity):
     """The top level function for calculating drive frequencies. The centre
@@ -21,9 +21,9 @@ def calculate_drive_freq_6(order, op_wavelength, ac_velocity, aod_spacing, cryst
     spacing = get_reduced_spacings(crystal_thickness, append(aod_spacing, focus_position[2]))
     shift = - ac_velocity / op_wavelength * array(focus_position[0:2]) # (-) for -1 mode 
     const = base_freq + array([0, 0, 0, \
-                            -shift(1,:) / sqrt(3) / spacing[3:6].sum(), \
-                            shift(0,:) / spacing[4:6].sum(), \
-                            shift(1,:) / sqrt(3) / spacing[5]])
+                            -shift[1] / sqrt(3) / spacing[3:6].sum(), \
+                            shift[0] / spacing[4:6].sum(), \
+                            shift[1] / sqrt(3) / spacing[5]])
             
     return (const, zeros, zeros)
 

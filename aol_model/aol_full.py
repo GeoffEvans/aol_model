@@ -18,10 +18,10 @@ class AolFull(object):
         
         crystal_thickness = array([a.crystal_thickness for a in aods], dtype=dtype(float))
         
-        if aods.size == 4:
+        if len(aods) is 4:
             (const, linear, quad) = calculate_drive_freq_4(order, op_wavelength, ac_velocity, aod_spacing, crystal_thickness, \
                                 base_freq, pair_deflection_ratio, focus_position, focus_velocity)
-        elif aods.size == 6:
+        elif len(aods) is 6:
             (const, linear, quad) = calculate_drive_freq_6(order, op_wavelength, ac_velocity, aod_spacing, crystal_thickness, \
                                 base_freq, pair_deflection_ratio, focus_position, focus_velocity)
         else:
