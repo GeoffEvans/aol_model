@@ -8,14 +8,14 @@ from set_up_utils import make_aod_narrow, make_aod_wide
 class AodVisualisation(object):
     """Useful class for exploring AOD properties graphically."""
     def __init__(self, op_wavelength_vac, \
-            ac_dir_rel=[1,0,0], \
+            ac_dir_rel=[cos(0.0),0,-sin(0.0)], \
             is_wide=True, \
             order=-1, \
             resolution=90, \
-            freq_bnds=(20,60), \
+            freq_bnds=(20,100), \
             deg_bnds=(0.5,3.5), \
             ):
-        normal = [0,0,1]
+        normal = [0,sin(0.0),cos(0.0)]
         self.aod = make_aod_narrow(normal, ac_dir_rel)
         if is_wide:
             self.aod = make_aod_wide(normal, ac_dir_rel)
@@ -214,9 +214,9 @@ class AodVisualisation(object):
         generic_plot(ac_power_range, func, labels, (min(ac_power_range),max(ac_power_range),0,1))
 
 if __name__ == '__main__':
-    av = AodVisualisation(700e-9, is_wide=False)
+    av = AodVisualisation(900e-9, is_wide=False)
     av.plot_efficiency_xangle_freq(ac_power=1.5)
-    av.plot_efficiency_xangle_freq_second_order_noise()
-    av = AodVisualisation(700e-9, is_wide=True)
+    #av.plot_efficiency_xangle_freq_second_order_noise(3)
+    av = AodVisualisation(900e-9, is_wide=True)
     av.plot_efficiency_xangle_freq(ac_power=1.5)
     #av.plot_efficiency_freq_max()
