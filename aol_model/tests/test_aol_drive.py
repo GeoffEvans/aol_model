@@ -35,7 +35,7 @@ def test_ray_passes_through_base_point():
     focus_position = array([0,0,10], dtype=dtype(float))
     focus_velocity = array([0,0,0], dtype=dtype(float))
     
-    aol = AolSimple.create_aol(order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity)
+    aol = AolSimple.create_aol(4, order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity)
 
     ray1 = RayParaxial([0,0,0], [0,0,1], op_wavelength)
     aol.propagate_to_distance_past_aol(ray1, 0, focus_position[2]) # t = 0
@@ -56,7 +56,7 @@ def test_ray_passes_through_focus():
     focus_position = array([1e-3,2e-3,3], dtype=dtype(float))
     focus_velocity = array([0,0,0], dtype=dtype(float))
     
-    aol = AolSimple.create_aol(order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity)
+    aol = AolSimple.create_aol(4, order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity)
 
     ray1 = RayParaxial([0,0,0], [0,0,1], op_wavelength)
     aol.propagate_to_distance_past_aol(ray1, 0, focus_position[2]) # t = 0
@@ -77,11 +77,11 @@ def test_focus_scans_correctly():
     time = 1e-4
      
     ray1 = RayParaxial([0,0,0], [0,0,1], op_wavelength)
-    aol1 = AolSimple.create_aol(order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity) 
+    aol1 = AolSimple.create_aol(4, order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity) 
     aol1.propagate_to_distance_past_aol(ray1, time, focus_position[2])
      
     ray2 = RayParaxial([0,0,0], [0,0,1], op_wavelength)
-    aol2 = AolSimple.create_aol(-order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity)# opposite order!
+    aol2 = AolSimple.create_aol(4, -order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity)# opposite order!
     aol2.propagate_to_distance_past_aol(ray2, time, focus_position[2])
          
     expected_position1 = focus_position + offset + time * focus_velocity

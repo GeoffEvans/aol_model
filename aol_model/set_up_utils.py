@@ -3,7 +3,7 @@
 from aol_model.aol_full import AolFull
 from aol_model.aod import Aod
 from aol_model.ray import Ray
-from numpy import array, linspace, exp, power, meshgrid, cos, sin, sqrt, cumsum
+from numpy import array, linspace, exp, power, meshgrid, cos, sin, sqrt, cumsum, tile
 from scipy.constants import pi
 from aol_model.vector_utils import normalise_list
 
@@ -39,19 +39,19 @@ def set_up_aol6( op_wavelength, \
                 pair_deflection_ratio=0, \
                 ac_power=[1.5,1.5,1.5,2,2,2]):
     """Create a 6 AOD AolFull instance complete with Aods. """
-    
-    dd = array([[1,0,0], [0.5,0.5*sqrt(3),0], [-0.5,0.5*sqrt(3),0], [-1,0,0], [-0.5,-0.5*sqrt(3),0], [0.5,-0.5*sqrt(3),0]])
-    orient_39_920 = normalise_list(-0.0365 * dd - 0.0585 * cumsum(dd, axis=0)[[5,0,1,2,3,4],:])
+
+    dd = array([[0.5,-0.5*sqrt(3),0], [1,0,0], [0.5,0.5*sqrt(3),0], [-0.5,0.5*sqrt(3),0], [-1,0,0], [-0.5,-0.5*sqrt(3),0]])
+    orient_39_920 = normalise_list(-0.0365 * dd - 0.0585 * cumsum(dd, axis=0)[[5,0,1,2,3,4],:] + tile([0,0,1], (6,1)))
 
     aod_spacing = array([5e-2] * 5)
-    aods = [0] * 6
     orientations = orient_39_920
+    aods = [0]*6
     aods[0] = make_aod_wide(orientations[0], dd[0])
     aods[1] = make_aod_wide(orientations[1], dd[1])
-    aods[2] = make_aod_narrow(orientations[2], dd[2])
-    aods[3] = make_aod_wide(orientations[0], dd[3])
-    aods[4] = make_aod_wide(orientations[1], dd[4])
-    aods[5] = make_aod_narrow(orientations[2], dd[5])
+    aods[2] = make_aod_wide(orientations[2], dd[2])
+    aods[3] = make_aod_narrow(orientations[3], dd[3])
+    aods[4] = make_aod_narrow(orientations[4], dd[4])
+    aods[5] = make_aod_narrow(orientations[5], dd[5])
 
     return AolFull.create_aol(aods, aod_spacing, order, op_wavelength, base_freq, pair_deflection_ratio, focus_position, focus_velocity, ac_power=ac_power)
 
@@ -81,6 +81,7 @@ def q(x, width):
 def r(x, lower, lower_width, upper, upper_width): # 11.13 Priestley, Introduction to Integration
     return q(upper - x, upper_width) * q(x - lower, lower_width)
 
+# very ugly code used here to store some data to use in next two functions
 import scipy.interpolate as interp
 freq_points = [20,22,23,24,25,27,28,30,33,35,37,38,39,40,41,42,43,45,47,50]
 narrow_profile_points = [0.54180401708669412, 0.56991991404193254, 0.64237496788483506, 0.71376549924079602, 0.65696105269933802, 0.4909423776444925, 0.4420660934868994, 0.50424863916826046, 0.68557630125400504, 0.80270163439279862, 0.84811765360796099, 0.92148223971098142, 0.95345973740663914, 0.93341096518369848, 0.87226301186133615, 0.84951540465223863, 0.8275046815345859, 0.77382549757853791, 0.7132103559071139, 0.67349178617290195]

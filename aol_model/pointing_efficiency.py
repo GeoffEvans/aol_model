@@ -1,8 +1,7 @@
 from plot_utils import multi_line_plot_vals
 from numpy import linspace, shape, pi, array, meshgrid, arange, prod, transpose, power, max
-from set_up_utils import get_ray_bundle, set_up_aol
+from set_up_utils import get_ray_bundle, set_up_aol6
 import matplotlib.pyplot as plt
-from scipy import ndimage
 from matplotlib import rcParams as r
 r.update({'font.size': 24})
 
@@ -68,13 +67,12 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
     #cset = plt.contour(angles, angles, img_blur, arange(0.3,1,0.2), linewidths=has_contour, cmap=plt.cm.coolwarm)
     #plt.clabel(cset, inline=True, fmt='%1.1f', fontsize=20)
 
-    labels = ["x angle / deg", "y angle / deg", "efficiency"]
     ax = fig.gca()
+    #labels = ["x angle / deg", "y angle / deg", "efficiency"]
     #ax.set_xlabel(labels[0])
     #ax.set_ylabel(labels[1])
     #ax.text(0.03, 0.9, description, transform=ax.transAxes, color='w', fontsize=27)
     ax.set_aspect('equal', adjustable='box')
-
 
     if False and pdr_z is not None and pdr_z[0] is not None and pdr_z[0] > -1:
         #ang = - 9e6 * (920e-9 / 613) * (1+pdr) * (180 / pi)
@@ -92,7 +90,7 @@ def generate_plot(normalised_img, description, colmap=plt.cm.bone, pdr_z=None):
 def get_effs(focus_position_many, pdr):
     #get eff for a 2d array for focus positions (so 3d array input)
     shp = focus_position_many.shape[0:2]
-    aols = [set_up_aol(op_wavelength, focus_position=f, base_freq=base_freq, pair_deflection_ratio=pdr) for f in focus_position_many.reshape(prod(shp), 3)]
+    aols = [set_up_aol6(op_wavelength, focus_position=f, base_freq=base_freq, pair_deflection_ratio=pdr) for f in focus_position_many.reshape(prod(shp), 3)]
     effs = [calculate_efficiency(a) for a in aols]
     return array(effs).reshape(shp)
 
@@ -110,6 +108,6 @@ def calculate_efficiency(aol):
     return power(energy / ray_count, 2)
 
 if __name__ == '__main__':
-    effs = plot_fov_surf(1e9, 0.3)
+    effs = plot_fov_surf(1e9, 1)
     #print max(effs)
     #plot_peak([-0.2, -0.25, -0.33, -0.4, -0.5, -1, -1e3, 1e3, 1, 0.5, 0.4, 0.33, 0.25, 0.2])

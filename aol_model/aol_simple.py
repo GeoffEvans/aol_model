@@ -121,7 +121,6 @@ class AolSimple(object):
 
     def diffract_at_aod(self, ray, time, aod_number):
         idx = aod_number-1
-
         aod_dir = self.aod_directions[idx]
         drive = self.acoustic_drives[idx]
 
