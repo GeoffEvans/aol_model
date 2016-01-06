@@ -1,6 +1,6 @@
 from numpy import array, dtype, pi, concatenate, zeros, append
 from acoustics import AcousticDrive
-from aol_drive import get_reduced_spacings, calculate_drive_freq_4
+from aol_drive import get_reduced_spacings, calculate_drive_freq_4, calculate_drive_freq_6
 from error_utils import check_is_unit_vector, check_is_of_length, check_is_singleton
 import copy
 
@@ -10,28 +10,35 @@ class AolSimple(object):
     calculating the AOD positions in the AolFull. Can work with ray or
     ray_paraxial. """
     @staticmethod
-    def create_aol(order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity, crystal_thickness=[0]*4):
+    def create_aol(num_of_aods, order, op_wavelength, ac_velocity, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity, crystal_thickness=[0]*4):
         # useful for converting a 'real' aol into the simple aol
-        reduced_spacing = get_reduced_spacings(crystal_thickness[0:3], aod_spacing) # reduce spacings because crystals are taken to be thin
-        z_reduced_focus_position = get_reduced_spacings(crystal_thickness[3], focus_position[2])
+        reduced_spacing = get_reduced_spacings(crystal_thickness[0:(num_of_aods-1)], aod_spacing) # reduce spacings because crystals are taken to be thin
+        z_reduced_focus_position = get_reduced_spacings(crystal_thickness[-1], focus_position[2])
         reduced_focus_position = concatenate( (focus_position[0:2], [z_reduced_focus_position]) )
 
-        (const, linear, _) = calculate_drive_freq_4(order, op_wavelength, ac_velocity, reduced_spacing, [0]*4, base_freq, \
-                                                    pair_deflection_ratio, reduced_focus_position, focus_velocity)
+        if num_of_aods == 4:
+            (const, linear, _) = calculate_drive_freq_4(order, op_wavelength, ac_velocity, reduced_spacing, [0]*4, base_freq, \
+                                    pair_deflection_ratio, reduced_focus_position, focus_velocity)
+        elif num_of_aods == 6:
+            (const, linear, _) = calculate_drive_freq_6(order, op_wavelength, ac_velocity, reduced_spacing, [0]*6, base_freq, \
+                                    pair_deflection_ratio, reduced_focus_position, focus_velocity)
+        else:
+            raise Exception('Unknown drive equations for number of AODs')
 
         check_is_singleton(ac_velocity)
-        return AolSimple.create_aol_from_drive(order, reduced_spacing, const, linear, op_wavelength)
+        return AolSimple.create_aol_from_drive(num_of_aods, order, reduced_spacing, const, linear, op_wavelength)
 
     @staticmethod
-    def create_aol_from_drive(order, aod_spacing, const, linear, op_wavelength):
+    def create_aol_from_drive(num_of_aods, order, aod_spacing, const, linear, op_wavelength):
         """Helper method to create the AOL with drive attributes."""
         acoustic_drives = AcousticDrive.make_acoustic_drives(const, linear)
 
-        aol = AolSimple(order, aod_spacing, acoustic_drives)
+        aol = AolSimple(num_of_aods, order, aod_spacing, acoustic_drives)
         aol.set_base_ray_positions(op_wavelength)
         return aol
 
-    def __init__(self, order, aod_spacing, acoustic_drives, base_ray_positions=zeros((4,2)), aod_directions=[[1,0,0],[0,1,0],[-1,0,0],[0,-1,0]]):
+    def __init__(self, num_of_aods, order, aod_spacing, acoustic_drives, base_ray_positions=zeros((4,2)), aod_directions=[[1,0,0],[0,1,0],[-1,0,0],[0,-1,0]]):
+        self.num_of_aods = num_of_aods
         self.order = order
         self.aod_spacing = array(aod_spacing, dtype=dtype(float))
         self.acoustic_drives = acoustic_drives
@@ -40,20 +47,10 @@ class AolSimple(object):
 
         for d in self.aod_directions:
             check_is_unit_vector(d)
-        check_is_of_length(3, self.aod_spacing)
-        check_is_of_length(4, self.acoustic_drives)
-        check_is_of_length(4, self.aod_directions)
-        check_is_of_length(4, self.base_ray_positions)
-
-    def update_drive(self, focus_position, focus_velocity, op_wavelength, base_freq, pair_deflection_ratio, crystal_thickness):
-        ac_velocity = [a.acoustic_drives.velocity for a in self.aods]
-        focus_position[2] = get_reduced_spacings(crystal_thickness[3], focus_position[2])
-
-        (const, linear, _) = calculate_drive_freq_4(self.order, op_wavelength, ac_velocity, self.aod_spacing, [0]*4, \
-                                        base_freq, pair_deflection_ratio, focus_position, focus_velocity)
-
-        self.acoustic_drives = AcousticDrive.make_acoustic_drives(const, linear)
-        self.set_base_ray_positions(op_wavelength)
+        check_is_of_length(num_of_aods-1, self.aod_spacing)
+        check_is_of_length(num_of_aods, self.acoustic_drives)
+        check_is_of_length(num_of_aods, self.aod_directions)
+        check_is_of_length(num_of_aods, self.base_ray_positions)
 
     def set_base_ray_positions(self, op_wavelength):
         self.base_ray_positions = self.find_base_ray_positions(op_wavelength)
@@ -63,14 +60,14 @@ class AolSimple(object):
         from ray_paraxial import RayParaxial
         tracer_ray = RayParaxial([0,0,0], [0,0,1], op_wavelength)
 
-        linear = [0]*4
-        for k in range(4):
+        linear = [0]*self.num_of_aods
+        for k in range(self.num_of_aods):
             linear[k] = self.acoustic_drives[k].linear # store values
             self.acoustic_drives[k].linear = 0
 
         path = self.propagate_to_distance_past_aol(tracer_ray, 0)
 
-        for k in range(4):
+        for k in range(self.num_of_aods):
             self.acoustic_drives[k].linear = linear[k] # restore values
 
         return path[:-1,0:2]
@@ -95,21 +92,21 @@ class AolSimple(object):
         ax.set_ylabel('y')
         ax.set_zlabel('z')
 
-        def add_planes():
-            for point in path_extended[1:5]:
+        def add_planes(num_pts):
+            for point in path_extended[1:num_pts]:
                 (xpts, ypts) = meshgrid([1., -1.], [1., -1.])
                 xpts += point[0]
                 ypts += point[1]
                 zpts = point[2] + zeros((2,2))
                 ax.plot_surface(xpts, ypts, zpts, color='blue', alpha=.3, linewidth=0, zorder=3)
 
-        add_planes()
+        add_planes(self.num_of_aods + 1)
         plt.show()
 
     def propagate_to_distance_past_aol(self, ray, time, distance=0):
         """Method to take a list of rays, propagate them through the AOL and then a given distance further. Ray states are changed."""
         spacings = append(self.aod_spacing, distance)
-        path = zeros( (5,3) )
+        path = zeros( (self.num_of_aods + 1, 3) )
 
         def diffract_and_propagate(aod_num):
             path[aod_num-1,:] = ray.position
@@ -117,9 +114,9 @@ class AolSimple(object):
             ray.propagate_free_space_z(spacings[aod_num-1])
 
         for k in range(spacings.size):
-            diffract_and_propagate(k+1)
+            diffract_and_propagate(k + 1)
 
-        path[4,:] = ray.position
+        path[self.num_of_aods,:] = ray.position
         return path
 
     def diffract_at_aod(self, ray, time, aod_number):

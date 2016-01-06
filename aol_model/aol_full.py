@@ -1,8 +1,8 @@
 from aol_simple import AolSimple
 from acoustics import AcousticDrive, default_power, teo2_ac_vel
-from aol_drive import calculate_drive_freq_4
+from aol_drive import calculate_drive_freq_4, calculate_drive_freq_6
 from acoustics import pointing_ramp_time
-from numpy import append, array, dtype, concatenate, zeros, atleast_2d, dot, isnan
+from numpy import append, array, dtype, concatenate, zeros, atleast_2d, dot, isnan, sqrt
 import copy
 
 # AOL model using AOD objects, incoroporating the Xu & Stroud diffraction theory.
@@ -14,11 +14,18 @@ class AolFull(object):
     @staticmethod
     def create_aol(aods, aod_spacing, order, op_wavelength, base_freq, pair_deflection_ratio, focus_position, \
             focus_velocity, ac_power=[default_power]*4, ac_velocity=teo2_ac_vel, ramp_time=pointing_ramp_time):
-
         """Helper method to create the AOL with AODs and drive attributes."""
+        
         crystal_thickness = array([a.crystal_thickness for a in aods], dtype=dtype(float))
-        (const, linear, quad) = calculate_drive_freq_4(order, op_wavelength, ac_velocity, aod_spacing, crystal_thickness, \
+        
+        if len(aods) is 4:
+            (const, linear, quad) = calculate_drive_freq_4(order, op_wavelength, ac_velocity, aod_spacing, crystal_thickness, \
                                 base_freq, pair_deflection_ratio, focus_position, focus_velocity)
+        elif len(aods) is 6:
+            (const, linear, quad) = calculate_drive_freq_6(order, op_wavelength, ac_velocity, aod_spacing, crystal_thickness, \
+                                base_freq, pair_deflection_ratio, focus_position, focus_velocity)
+        else:
+            raise Exception('Unknown drive equations for number of AODs')
 
         acoustic_drives = AcousticDrive.make_acoustic_drives(const, linear, quad, ac_power, ac_velocity, ramp_time)
         return AolFull(aods, aod_spacing, acoustic_drives, order, op_wavelength)
@@ -28,8 +35,12 @@ class AolFull(object):
         self.aod_spacing = array(aod_spacing, dtype=dtype(float))
         self.acoustic_drives = array(acoustic_drives)
         self.order = order
-
-        simple = AolSimple(order, self.aod_spacing, self.acoustic_drives)
+        self.num_of_aods = self.aods.size
+        aod_dirs = [[1,0,0],[0,1,0],[-1,0,0],[0,-1,0]] 
+        if self.num_of_aods == 6:
+            aod_dirs = 0.5 * array([[2,0,0],[1,sqrt(3),0],[-1,sqrt(3),0],[-2,0,0],[-1,-sqrt(3),0],[1,-sqrt(3),0]])
+            
+        simple = AolSimple(self.num_of_aods, order, self.aod_spacing, self.acoustic_drives, zeros((self.num_of_aods,2)), aod_dirs)
         self.base_ray_positions = simple.find_base_ray_positions(op_wavelength)
 
     def plot_ray_through_aol(self, rays, time, distance):
@@ -56,8 +67,8 @@ class AolFull(object):
         ax.set_zlabel('z')
 
         def add_planes():
-            pts = mean(paths_extended[:,1:9,:], axis=0)
-            for m in range(8):
+            pts = mean(paths_extended[:,1:(self.num_of_aods*2+1),:], axis=0)
+            for m in range(self.num_of_aods*2):
                 normal = self.aods[m/2].normal # integer division
                 axis_z = dot(pts[m], normal) / normal[2] # value of z plane cuts on axis
                 (xpts, ypts) = array(meshgrid([1, -1], [1, -1])) * 1e-2
@@ -76,8 +87,8 @@ class AolFull(object):
         crystal_thickness = array([a.crystal_thickness for a in self.aods], dtype=dtype(float))
         spacings = append(self.aod_spacing, distance)
         normals = concatenate( ([a.normal for a in self.aods], atleast_2d([0,0,1])) )
-        paths = zeros( (len(rays),9,3) )
-        energies = zeros( (len(rays),4) )
+        paths = zeros( (len(rays),self.num_of_aods*2+1,3) )
+        energies = zeros( (len(rays), self.num_of_aods) )
 
         for m in range(num_rays): # move rays to entrance of first crystal
                 rays[m].propagate_from_plane_to_plane(0, array([0.,0.,1.]), self.aods[0].normal)
@@ -96,7 +107,7 @@ class AolFull(object):
             diffract_and_propagate(k+1)
 
         for m in range(num_rays):
-            paths[m,8,:] = rays[m].position
+            paths[m,self.num_of_aods*2,:] = rays[m].position
         return (paths, energies)
 
     def diffract_at_aod(self, rays, time, aod_number):

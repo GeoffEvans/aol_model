@@ -3,7 +3,7 @@
 from aol_model.aol_full import AolFull
 from aol_model.aod import Aod
 from aol_model.ray import Ray
-from numpy import array, linspace, exp, power, meshgrid, cos, sin
+from numpy import array, linspace, exp, power, meshgrid, cos, sin, sqrt, cumsum
 from scipy.constants import pi
 from aol_model.vector_utils import normalise_list
 
@@ -28,6 +28,30 @@ def set_up_aol( op_wavelength, \
     aods[1] = make_aod_wide(orientations[1], [0,1,0])
     aods[2] = make_aod_narrow(orientations[2], [-1,0,0])
     aods[3] = make_aod_narrow(orientations[3], [0,-1,0])
+
+    return AolFull.create_aol(aods, aod_spacing, order, op_wavelength, base_freq, pair_deflection_ratio, focus_position, focus_velocity, ac_power=ac_power)
+
+def set_up_aol6( op_wavelength, \
+                order=-1, \
+                base_freq=39e6, \
+                focus_position=[0,0,1e12], \
+                focus_velocity=[0,0,0], \
+                pair_deflection_ratio=0, \
+                ac_power=[1.5,1.5,1.5,2,2,2]):
+    """Create a 6 AOD AolFull instance complete with Aods. """
+    
+    dd = array([[1,0,0], [0.5,0.5*sqrt(3),0], [-0.5,0.5*sqrt(3),0], [-1,0,0], [-0.5,-0.5*sqrt(3),0], [0.5,-0.5*sqrt(3),0]])
+    orient_39_920 = normalise_list(-0.0365 * dd - 0.0585 * cumsum(dd, axis=0)[[5,0,1,2,3,4],:])
+
+    aod_spacing = array([5e-2] * 5)
+    aods = [0] * 6
+    orientations = orient_39_920
+    aods[0] = make_aod_wide(orientations[0], dd[0])
+    aods[1] = make_aod_wide(orientations[1], dd[1])
+    aods[2] = make_aod_narrow(orientations[2], dd[2])
+    aods[3] = make_aod_wide(orientations[0], dd[3])
+    aods[4] = make_aod_wide(orientations[1], dd[4])
+    aods[5] = make_aod_narrow(orientations[2], dd[5])
 
     return AolFull.create_aol(aods, aod_spacing, order, op_wavelength, base_freq, pair_deflection_ratio, focus_position, focus_velocity, ac_power=ac_power)
 
