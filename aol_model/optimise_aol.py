@@ -4,7 +4,7 @@ from numpy import arange, linspace, pi, arctan2, array, cos, sin, sqrt, append
 from numpy.linalg import norm
 from scipy import optimize
 from aod_visualisation import generic_plot_surface
-from set_up_utils import set_up_aol, get_ray_bundle
+from set_up_utils import set_up_aol6, get_ray_bundle
 
 op_wavelength = 909e-9
 base_freq = 39e6
@@ -47,22 +47,15 @@ def plot_region(aod_num, aol):
     either side of the peak such that the line between them crosses the peak.
     The x,y angles will be printed to the console."""
 
-    def func(scan_deg, y_deg):
-        x = scan_deg * pi/180
-        y = y_deg * pi/180
+    def func(x, y):
         new_normal = [x, y, sqrt(1 - x**2 - y**2)]
         aol.change_orientation(aod_num, new_normal)
         energies = calculate_efficiency(aol, aod_num)
         return energies
 
     labels = ["incidence angle / deg","transverse incidence angle / deg","efficiency"]
-    x_ax = linspace(-0.05, 0.05, 20)*180/pi
-    y_ax = linspace(-0.2, 0.2, 30)*180/pi
-    if aod_num % 2 == 0:
-        temp = x_ax
-        x_ax = y_ax
-        y_ax = temp
-
+    x_ax = linspace(-0.1, 0.02, 30) # rads
+    y_ax = linspace(-0.1, -0.02, 20)
     generic_plot_surface(x_ax, y_ax, func, labels)
 
 def optimise_nth_aod_by_hand(aod_num, aol):
@@ -101,7 +94,7 @@ def calculate_efficiency(aol, after_nth_aod, op_wavelength=op_wavelength):
     for t in time_array:
         rays = get_ray_bundle(op_wavelength)
 
-        (_,energies) = aol.propagate_to_distance_past_aol(rays, t)
+        (_,energies) = aol.propagate_to_distance_past_aol(rays, t) 
         energy += sum(energies[:,after_nth_aod-1])
         ray_count += len(rays)
 
@@ -116,12 +109,14 @@ def get_best_pdr_y(pdr, ang):
     return -calculate_efficiency(aol, 2) * calculate_efficiency(aol, 4) / calculate_efficiency(aol, 3)
 
 if __name__ == '__main__':
-    aol = set_up_aol(op_wavelength, base_freq=base_freq, pair_deflection_ratio=pdr, focus_position=[0,0,1e12])
+    aol = set_up_aol6(op_wavelength, base_freq=base_freq, pair_deflection_ratio=pdr, focus_position=[0,0,1e12])
     print calculate_efficiency(aol, 1)
     print calculate_efficiency(aol, 2)/calculate_efficiency(aol, 1)
     print calculate_efficiency(aol, 3)/calculate_efficiency(aol, 2)
-    print calculate_efficiency(aol, 4) # check efficiency at AOD
-
+    print calculate_efficiency(aol, 4)/calculate_efficiency(aol, 3)
+    print calculate_efficiency(aol, 5)/calculate_efficiency(aol, 4)
+    print calculate_efficiency(aol, 6)/calculate_efficiency(aol, 5)
+    print calculate_efficiency(aol, 6)
 
     #import matplotlib.pyplot as plt
     #import scipy.optimize as opt
@@ -131,5 +126,5 @@ if __name__ == '__main__':
     #    pdrs.append(opt.minimize_scalar(get_best_pdr_x, bounds=(-0.5, 2), method='bounded', args=(ang,)).x)
     #plt.plot(list_ang, pdrs)
 
-    #plot_region(1, aol) # make plot, click on two points both lying on the same line through the peak
+    #plot_region(5, aol) # make plot, click on two points both lying on the same line through the peak
     #optimise_nth_aod_by_hand(1, aol) # optimise aod using previous plot

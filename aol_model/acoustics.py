@@ -46,9 +46,7 @@ class AcousticDrive(object):
     def make_acoustic_drives(const, linear, quad=[0]*4, power=[default_power]*4, velocity=teo2_ac_vel, ramp_time=None):
         """Generates four AcousticDrive objects at a time. The function is useful
         because and AOL has four AODs, and each AOD requires a corresponding AcousticDrive."""
-        acoustic_drives = [0]*4
-        for k in range(4):
-            acoustic_drives[k] = AcousticDrive(const[k], linear[k], quad[k], power[k], velocity, ramp_time)
+        acoustic_drives = [AcousticDrive(c, l, q, p, velocity, ramp_time) for (c, l, q, p) in zip(const, linear, quad, power)]
         return array(acoustic_drives)
 
     def __init__(self, const, linear, quad=0, power=default_power, velocity=teo2_ac_vel, ramp_time=None):

@@ -2,7 +2,7 @@ from aol_simple import AolSimple
 from acoustics import AcousticDrive, default_power, teo2_ac_vel
 from aol_drive import calculate_drive_freq_4, calculate_drive_freq_6
 from acoustics import pointing_ramp_time
-from numpy import append, array, dtype, concatenate, zeros, atleast_2d, dot, isnan, sqrt
+from numpy import append, array, dtype, concatenate, zeros, atleast_2d, dot, isnan
 import copy
 
 # AOL model using AOD objects, incoroporating the Xu & Stroud diffraction theory.
@@ -15,9 +15,9 @@ class AolFull(object):
     def create_aol(aods, aod_spacing, order, op_wavelength, base_freq, pair_deflection_ratio, focus_position, \
             focus_velocity, ac_power=[default_power]*4, ac_velocity=teo2_ac_vel, ramp_time=pointing_ramp_time):
         """Helper method to create the AOL with AODs and drive attributes."""
-        
+
         crystal_thickness = array([a.crystal_thickness for a in aods], dtype=dtype(float))
-        
+
         if len(aods) is 4:
             (const, linear, quad) = calculate_drive_freq_4(order, op_wavelength, ac_velocity, aod_spacing, crystal_thickness, \
                                 base_freq, pair_deflection_ratio, focus_position, focus_velocity)
@@ -36,11 +36,8 @@ class AolFull(object):
         self.acoustic_drives = array(acoustic_drives)
         self.order = order
         self.num_of_aods = self.aods.size
-        aod_dirs = [[1,0,0],[0,1,0],[-1,0,0],[0,-1,0]] 
-        if self.num_of_aods == 6:
-            aod_dirs = 0.5 * array([[2,0,0],[1,sqrt(3),0],[-1,sqrt(3),0],[-2,0,0],[-1,-sqrt(3),0],[1,-sqrt(3),0]])
-            
-        simple = AolSimple(self.num_of_aods, order, self.aod_spacing, self.acoustic_drives, zeros((self.num_of_aods,2)), aod_dirs)
+
+        simple = AolSimple(self.num_of_aods, order, self.aod_spacing, self.acoustic_drives, zeros((self.num_of_aods,2)), [a.relative_acoustic_direction for a in aods])
         self.base_ray_positions = simple.find_base_ray_positions(op_wavelength)
 
     def plot_ray_through_aol(self, rays, time, distance):
@@ -103,7 +100,7 @@ class AolFull(object):
                 spacing_less_thickness = spacings[aod_num-1] - crystal_thickness[aod_num-1]/dot(self.aods[aod_num-1].normal, array([0,0,1]))
                 rays[m].propagate_from_plane_to_plane(spacing_less_thickness, normals[aod_num-1], normals[aod_num])
 
-        for k in range(4):
+        for k in range(self.num_of_aods):
             diffract_and_propagate(k+1)
 
         for m in range(num_rays):
@@ -116,8 +113,8 @@ class AolFull(object):
         aod = self.aods[idx]
         base_ray_position = self.base_ray_positions[idx]
         drive = self.acoustic_drives[idx]
-        local_acoustics = drive.get_local_acoustics(time, [r.position for r in rays], base_ray_position, aod.acoustic_direction)
 
+        local_acoustics = drive.get_local_acoustics(time, [r.position for r in rays], base_ray_position, aod.acoustic_direction)
         aod.propagate_ray(rays, local_acoustics, self.order)
 
     def change_orientation(self, aod_num, new_normal):

@@ -27,7 +27,7 @@ aods[2] = Aod([0,0,1], [-1, 0,0], 25e-3, 1.6e-3, crystal_thickness)
 aods[3] = Aod([0,0,1], [ 0,-1,0], 25e-3, 1.6e-3, crystal_thickness)
 
 aol = AolFull.create_aol(aods, aod_spacing, order, op_wavelength, base_freq, pair_deflection_ratio, focus_position, focus_velocity)
-aol_simple = AolSimple.create_aol(order, op_wavelength, teo2_ac_vel, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity, [crystal_thickness]*4)
+aol_simple = AolSimple.create_aol(len(aods), order, op_wavelength, teo2_ac_vel, aod_spacing, base_freq, pair_deflection_ratio, focus_position, focus_velocity, [crystal_thickness]*4)
 
 def test_aol_drives_same():
     const_full = [a.const for a in aol.acoustic_drives]
