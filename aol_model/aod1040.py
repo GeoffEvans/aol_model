@@ -4,8 +4,10 @@ import matplotlib.pyplot as plt
 
 av_narrow = AodVisualisation(1040e-9, ac_dir_rel=[1,0,0], is_wide=False, deg_bnds=(-1,6), freq_bnds=(20,60))
 av_wide = AodVisualisation(1040e-9, ac_dir_rel=[1,0,0], is_wide=True, deg_bnds=(-1,6), freq_bnds=(20,60))
+av_wide.aod.transducer_width = 3.8e-3
 av_narrow2 = AodVisualisation(800e-9, ac_dir_rel=[1,0,0], is_wide=False, deg_bnds=(-1,6), freq_bnds=(20,60))
 av_wide2 = AodVisualisation(800e-9, ac_dir_rel=[1,0,0], is_wide=True, deg_bnds=(-1,6), freq_bnds=(20,60))
+av_wide2.aod.transducer_width = 3.8e-3
 #av_narrow.plot_efficiency_xangle_freq(ac_power=1.5)
 #av_wide.plot_efficiency_xangle_freq(ac_power=1.5)
 #av_narrow.plot_efficiency_freq_max()
@@ -18,7 +20,7 @@ e800 = np.array([57, 69, 71, 73, 77, 83, 85.5, 86.5, 87.5, 88, 86, 84, 79, 73, 6
 plt.plot(f, e1040, 'o')
 plt.plot(f, e800, 'o')
 
-av_wide.plot_efficiency_freq(ac_power=2.1, deg=2.22)
-av_wide2.plot_efficiency_freq(ac_power=1.2, deg=2.05)
-av_narrow.plot_efficiency_freq(ac_power=2.1, deg=2.22)
-av_narrow2.plot_efficiency_freq(ac_power=1.2, deg=2.05)
+av_wide.plot_efficiency_freq(ac_power=1.8, deg=2.24)
+av_wide2.plot_efficiency_freq(ac_power=1., deg=2.03)
+av_narrow.plot_efficiency_freq(ac_power=1.8, deg=2.25)
+av_narrow2.plot_efficiency_freq(ac_power=1., deg=2.03)
