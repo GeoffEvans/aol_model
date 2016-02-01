@@ -131,7 +131,7 @@ class AodVisualisation(object):
             return ray.energy
 
         labels = ["Frequency / MHz","Efficiency"]
-        generic_plot(self.mhz_range, func, labels)
+        generic_plot(self.mhz_range, func, labels, limits=[min(self.mhz_range),max(self.mhz_range),0,1])
 
     def plot_efficiency_freq_max(self, ac_power=1.5):
         """Plot maximum diffraction efficiency for any incidence angle against acoustic frequency."""
