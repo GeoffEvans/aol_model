@@ -11,9 +11,9 @@ class AodVisualisation(object):
             ac_dir_rel=[cos(0.0),0,-sin(0.0)], \
             is_wide=True, \
             order=-1, \
-            resolution=90, \
-            freq_bnds=(20,100), \
-            deg_bnds=(0.5,3.5), \
+            resolution=60, \
+            freq_bnds=(20,60), \
+            deg_bnds=(0.5,4.5), \
             ):
         normal = [0,sin(0.0),cos(0.0)]
         self.aod = make_aod_narrow(normal, ac_dir_rel)
@@ -25,6 +25,20 @@ class AodVisualisation(object):
         self.mhz_range = linspace(freq_bnds[0], freq_bnds[1], resolution)
         self.degrees_range =  linspace(deg_bnds[0], deg_bnds[1], resolution)
 
+    def plot_mismatch_xangle(self, ac_power=1.5, freq=39):
+        """Plot diffraction efficiency against acoustic frequency for fixed incidence angle."""
+        def func(deg):
+            ang = deg * pi/180 / 2.226
+            wavevector_unit = [sin(ang), 0, cos(ang)]
+            ray = Ray([0,0,0], wavevector_unit, self.op_wavelength_vac)
+            acoustics = Acoustics(freq*1e6, ac_power)
+
+            (mismatch,_,_) = diffract_by_wavevector_triangle(self.aod, [ray.wavevector_unit], [ray.wavevector_vac_mag], [acoustics], self.order, (0,1))
+            return abs(mismatch)
+
+        labels = ["Incidence angle / deg", "Mismatch"]
+        generic_plot(self.degrees_range, func, labels)
+        
     def plot_mismatch_angle_freq(self, ac_power=1.5):
         """Plot wavevector mismatch between incident optic wavevector,
         acoustic wavevector and diffracted optic wavevector against
@@ -35,7 +49,7 @@ class AodVisualisation(object):
             ray = Ray([0,0,0], wavevector_unit, self.op_wavelength_vac)
             acoustics = Acoustics(mhz*1e6, ac_power)
 
-            (mismatch,_) = diffract_by_wavevector_triangle(self.aod, [ray], [acoustics], self.order, (0,1))
+            (mismatch,_,_) = diffract_by_wavevector_triangle(self.aod, [ray.wavevector_unit], [ray.wavevector_vac_mag], [acoustics], self.order, (0,1))
             return abs(mismatch)
 
         labels = ["Incidence angle / deg","frequency / MHz","Wavevector mismatch / 1/m"]
@@ -133,6 +147,22 @@ class AodVisualisation(object):
         labels = ["Frequency / MHz","Efficiency"]
         generic_plot(self.mhz_range, func, labels, limits=[min(self.mhz_range),max(self.mhz_range),0,1])
 
+    def plot_efficiency_angle_out(self, ac_power=1.5, deg=2.2):
+        """Plot diffraction efficiency against acoustic frequency for fixed incidence angle."""
+        def func(angle_out):
+            mhz = angle_out / 1e6 * 613 / self.op_wavelength_vac + 39
+            ang = deg * pi / 180
+            wavevector_unit = [sin(ang), 0, cos(ang)]
+            ray = Ray([0,0,0], wavevector_unit, self.op_wavelength_vac)
+            acoustics = Acoustics(mhz*1e6, ac_power)
+
+            self.aod.propagate_ray([ray], [acoustics], self.order)
+            return ray.energy
+
+        labels = ["Frequency / MHz","Efficiency"]
+        x = (self.mhz_range - 39) / 613 * self.op_wavelength_vac * 1e6
+        generic_plot(x, func, labels, limits=[min(x),max(x),0,1])
+
     def plot_efficiency_freq_max(self, ac_power=1.5):
         """Plot maximum diffraction efficiency for any incidence angle against acoustic frequency."""
         def func(mhz):
@@ -214,9 +244,11 @@ class AodVisualisation(object):
         generic_plot(ac_power_range, func, labels, (min(ac_power_range),max(ac_power_range),0,1))
 
 if __name__ == '__main__':
-    av = AodVisualisation(900e-9, is_wide=False)
-    av.plot_efficiency_xangle_freq(ac_power=1.5)
+    av = AodVisualisation(800e-9, is_wide=False)
+    av.plot_mismatch_xangle()
+    #av.plot_efficiency_xangle_freq(ac_power=1.5)    
+    #av.plot_efficiency_xangle()
     #av.plot_efficiency_xangle_freq_second_order_noise(3)
-    av = AodVisualisation(900e-9, is_wide=True)
-    av.plot_efficiency_xangle_freq(ac_power=1.5)
+    #av = AodVisualisation(800e-9, is_wide=True)
+    #av.plot_efficiency_xangle_freq(ac_power=1.5)
     #av.plot_efficiency_freq_max()

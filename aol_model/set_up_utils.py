@@ -68,6 +68,9 @@ def get_ray_bundle(op_wavelength, width=15e-3):
             rays.append(Ray([x,y,0], [0,0,1], op_wavelength))
     return rays
 
+def get_single_ray(op_wavelength, width=15e-3):
+    return [Ray([0,0,0], [0,0,1], op_wavelength)]
+
 def p(x, width):
     val = x*0
     val[x > 0] = exp(-power(x[x > 0], -1) * width)
@@ -94,7 +97,7 @@ def transducer_efficiency_narrow(freq_raw):
     vals = interp.splev(array(freq)/1e6, narrow_acc_profile)
     vals[freq > 50e6] = interp.splev(50, narrow_acc_profile)
     vals[freq < 20e6] = interp.splev(20, narrow_acc_profile) * r(freq[freq < 20e6], 18e6, 2e6, 85e6, 10e6)
-    return vals
+    return vals * r(freq, 0e6, 0e6, 70e6, 10e6) # arbitrary cut-off imposed, above experimentally tested frequencies
 def transducer_efficiency_wide(freq_raw):
     freq = array(freq_raw)
     vals = interp.splev(array(freq)/1e6, wide_acc_profile)

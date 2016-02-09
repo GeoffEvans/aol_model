@@ -56,7 +56,7 @@ def diffract_by_wavevector_triangle(aod, wavevec_unit_in, wavevec_vac_mag_in, lo
 def get_resultant_wavevectors(aod, wavevec_unit_in, wavevec_vac_mag_in, local_acoustics, order, ref_inds):
     """Calculate the sum of the incident optic and acoustic wavevectors."""
     n_in = ref_ind_ext_ord(aod, wavevec_unit_in, wavevec_vac_mag_in)[ref_inds[0]]
-    wavevectors_in = (n_in * wavevec_vac_mag_in * wavevec_unit_in.T).T
+    wavevectors_in = (n_in * wavevec_vac_mag_in * array(wavevec_unit_in).T).T
     wavevectors_ac = outer(array([a.wavevector_mag for a in local_acoustics]), aod.acoustic_direction)
     return wavevectors_in + order * wavevectors_ac
 
