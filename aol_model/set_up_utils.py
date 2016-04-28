@@ -16,9 +16,9 @@ def set_up_aol( op_wavelength, \
                 ac_power=[1.5,1.5,2,2]):
     """Create an AolFull instance complete with Aods. """
     orient_39_920 = normalise_list(array([ \
-        [-0.0365, 0., 1], \
+        [-0.0355, 0., 1], \
         [-0.0585, -0.0365,  1], \
-        [-0.020, -0.0585,  1], \
+        [-0.0255, -0.0585,  1], \
         [0.0, -0.026, 1] ])) # 0.022
 
     aod_spacing = array([5e-2] * 3)

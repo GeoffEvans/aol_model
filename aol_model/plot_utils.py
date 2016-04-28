@@ -67,5 +67,5 @@ def multi_line_plot_vals(x, y_many, labels, lgnd, limits=0):
     plt.ylabel(labels[1])
     if not limits == 0:
         plt.axis(limits)
-    plt.grid()
+    plt.tick_params(direction='out')
     plt.show()
