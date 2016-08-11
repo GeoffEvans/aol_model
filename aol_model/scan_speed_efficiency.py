@@ -61,8 +61,8 @@ def calculate_efficiency(aol, time):
     return energy / ray_count
 
 if __name__ == '__main__':
-    f = 1
-    dwell = array([4000,2000,1000,500,200,100,50])
+    f = 0.4
+    dwell = array([4000,2000,1000,500,300,200,100,50,25])
     # -abs(array([[-1e2,0,0],[-2e2,0,0],[-3e2,0,0],[-5e2,0,0],[-8e2,0,0],[-2e3,0,0]]))
     plot_lines(f, dwell)
     #plot_fov_surf(1e1, 600 * array([1,0,0]))
